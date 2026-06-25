@@ -38,6 +38,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chỗ xem lịch cúp điện'),
+       centerTitle: true,
       ),
 
       body: pages[currentPage],

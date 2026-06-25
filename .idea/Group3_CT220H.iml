@@ -9,6 +9,9 @@
       <excludeFolder url="file://$MODULE_DIR$/wae_project/android/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/wae_project/android/build" />
       <excludeFolder url="file://$MODULE_DIR$/wae_project/build" />
+      <excludeFolder url="file://$MODULE_DIR$/application/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/application/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/application/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
