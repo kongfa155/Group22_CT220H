@@ -21,7 +21,7 @@ class WeatherCard extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.circular(30), // bo goc
-        color: Colors.red.withValues(
+        color: Colors.white.withValues(
           alpha: 0.2,
         ), // mau thuy trang thuy tinh trong suot
       ),
