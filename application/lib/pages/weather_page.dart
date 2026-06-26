@@ -1,8 +1,10 @@
 import 'dart:ui';
-
+import 'package:application/services/weather_service.dart';
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
-import 'package:application/apiWeather.dart';
+import 'package:application/services/location_service.dart';
+import 'package:geolocator/geolocator.dart';
+import '../components/widgets/weather_card.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -12,26 +14,30 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
-  final WeatherFactory _apiW = WeatherFactory(WEATHER_API_KEY);
-  final String location = "";
-
+  final WeatherService _weatherService = WeatherService();  //goi dich vu thoi tiet
+  final LocationService _locationService = LocationService();
   @override
   void initState() {
     super.initState();
-    _apiW
-        .currentWeatherByCityName("Can Tho, VN")
-        .then((weather) {
-          print("Nhan data thanh cong");
-          print(weather.weatherIcon);
-          setState(() {
-            _weather = weather;
-          });
-        })
-        .catchError((error) {
-          print("LOI API: $error");
-        });
+    getInfomationWeather(); //ham lay thong tin du lieu
   }
-
+void getInfomationWeather() async {
+    try {
+      Position position = await _locationService.getCurrentLocation();
+      print("Kinh do: ${position.longitude}");
+      print("Vi do: ${position.latitude}");
+      Weather? weather = await _weatherService.getWeather(
+          position.latitude,
+          position.longitude
+      );
+      //Cap nhat state weather
+      setState(() {
+        _weather = weather;
+      });
+    } catch (error){
+      print("Loi ham loadWeather $error");
+    }
+}
   Weather? _weather; // doi tuong de luu thoi tiet
 
   @override
@@ -42,6 +48,7 @@ class _WeatherPageState extends State<WeatherPage> {
   Widget MyPageWeatherForecast() {
     if (_weather == null) {
       //Neu ma chua co data thi hien thi vong tron loading
+      // _weather.
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -56,33 +63,8 @@ class _WeatherPageState extends State<WeatherPage> {
     return SizedBox(
       height: MediaQuery.sizeOf(context).height,
       width: MediaQuery.sizeOf(context).width,
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                width: 300,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    width: 1.5,
-                  ),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Glass Effect",
-                    style: TextStyle(color: Colors.white, fontSize: 25),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+      child:  WeatherCard(
+        weather: _weather!, //truyen tham so weather
       ),
     );
   }

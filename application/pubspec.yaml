@@ -39,6 +39,10 @@ dependencies:
   weather: ^3.2.1 # them thu vien weather de ho tro tich hop goi API tu OpenWeatherMap API
   intl: ^0.20.3 # xu ly dinh dang du lieu theo ngon ngu/ khu vuc
   weather_icons: ^3.0.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  geolocator: ^13.0.1 #thu vien lay toa do vi tri hien tai cua user
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
