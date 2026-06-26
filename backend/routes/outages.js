@@ -3,6 +3,5 @@ const router = express.Router();
 
 const controller = require("../controllers/outageController");
 
-router.post("/", controller.createOutage);
-
+router.post("/raw", controller.createRawOutage);
 module.exports = router;

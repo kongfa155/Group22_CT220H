@@ -5,8 +5,6 @@
     final String date;
     final String time;
     final String area;
-    final double? lat;
-    final double? lng;
     final String reason;
     final String status;
     //Constructor
@@ -15,8 +13,6 @@
       required this.date,
       required this.time,
       required this.area,
-      this.lat,
-      this.lng,
       required this.reason,
       required this.status,
     });
@@ -56,8 +52,6 @@
         Khu vực: $area
         Lý do: $reason
         Trạng thái: $status
-        Kinh độ: $lat
-        Vĩ độ: $lng
         ''';
     }
     // Điện lực: Điện lực Quận Ninh Kiều
@@ -66,6 +60,15 @@
     // Khu vực: toàn bộ Khu vực Cồn Khương Phường Cái Khế TPCT (Dữ liệu mới cào, chưa clean)
     // Lý do: Bảo trì, sửa chữa lưới điện
     // Trạng thái: Đang thực hiện
-    // Kinh độ: null
-    // Vĩ độ: null
+
+    Map<String, dynamic> toJson() {
+      return {
+        "powerCompany": powerCompany,
+        "date": date,
+        "time": time,
+        "area": area,
+        "reason": reason,
+        "status": status,
+      };
+    }
   }

@@ -1,47 +1,77 @@
 const pool = require("../config/db");
 
-exports.createOutage = async (req, res) => {
+function parseDate(text) {
+    const match = text.match(
+        /(\d+)\s*tháng\s*(\d+)\s*năm\s*(\d+)/
+    );
 
+    if (!match) return null;
+
+    const day = match[1].padStart(2, "0");
+    const month = match[2].padStart(2, "0");
+    const year = match[3];
+
+    return `${year}-${month}-${day}`;
+}
+
+function parseTime(text) {
+    const match = text.match(
+        /(\d{1,2}:\d{2}).*(\d{1,2}:\d{2})/
+    );
+
+    if (!match) {
+        return {
+            start: null,
+            end: null
+        };
+    }
+
+    return {
+        start: `${match[1]}:00`,
+        end: `${match[2]}:00`
+    };
+}
+
+exports.createRawOutage = async (req, res) => {
     try {
-
         const {
-            company,
+            powerCompany,
             date,
             time,
             area,
             reason,
-            status,
-            latitude,
-            longitude
+            status
         } = req.body;
+
+        const outageDate =
+            parseDate(date);
+
+        const {
+            start,
+            end
+        } = parseTime(time);
 
         await pool.query(
             `
-            INSERT INTO electric_outages(
-                company,
-                outage_date,
-                outage_time,
-                area,
+            INSERT INTO electric_outages_raw(
+                power_company,
+                area_text,
                 reason,
                 status,
-                latitude,
-                longitude,
-                geom
+                outage_date,
+                start_time,
+                end_time
             )
-            VALUES(
-                $1,$2,$3,$4,$5,$6,$7,$8,
-                ST_SetSRID(ST_MakePoint($8,$7),4326)
-            )
+            VALUES ($1,$2,$3,$4,$5,$6,$7)
             `,
             [
-                company,
-                date,
-                time,
+                powerCompany,
                 area,
                 reason,
                 status,
-                latitude,
-                longitude
+                outageDate,
+                start,
+                end
             ]
         );
 
@@ -50,11 +80,10 @@ exports.createOutage = async (req, res) => {
         });
 
     } catch (err) {
-
         console.error(err);
 
-        res.status(500).json(err);
-
+        res.status(500).json({
+            message: err.message
+        });
     }
-
-}
+};
