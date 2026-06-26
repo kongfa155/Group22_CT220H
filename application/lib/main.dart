@@ -49,7 +49,7 @@ class _MainPageState extends State<MainPage> {
               icon: Icon(Icons.electrical_services),
               label: 'Điện'),
           NavigationDestination(
-              icon: Icon(Icons.beach_access),
+              icon: Icon(Icons.sunny),
               label: 'Thời tiết')
         ],
         selectedIndex: currentPage,

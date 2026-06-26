@@ -52,7 +52,7 @@ class GeocodingService {
         if (data.isNotEmpty) {
           return {
             'lat': double.parse(data[0]['lat']),
-            'lng': double.parse(data[0]['lon']),
+            'lng': double.parse(data[0]['lng']),
           };
         }
       }

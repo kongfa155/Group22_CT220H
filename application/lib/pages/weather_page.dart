@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:application/services/weather_service.dart';
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
