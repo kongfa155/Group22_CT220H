@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
 import 'dart:ui';
-import '../logicBackground.dart';
 
 class WeatherCard extends StatelessWidget {
   final Weather weather;
@@ -10,19 +9,7 @@ class WeatherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.sizeOf(context).width,
-      height: MediaQuery.sizeOf(context).height,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(
-            getBackground(weather.weatherMain ?? "clear"),
-          ),
-          fit: BoxFit.cover,
-        ),
-      ),
-
-      child: Column(
+    return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(height: 20),
@@ -68,7 +55,6 @@ class WeatherCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }
