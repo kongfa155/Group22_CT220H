@@ -18,7 +18,7 @@ class ForecastListCard extends StatelessWidget {
           Weather weather = forecast[index];
           return Container(
             width: 110,
-            margin: EdgeInsets.fromLTRB(2,10,2,0),
+            margin: EdgeInsets.fromLTRB(2, 10, 2, 0),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
@@ -28,30 +28,30 @@ class ForecastListCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "${weather.date?.day}/${weather.date?.month}\n${weather.date?.hour}:00",
+                  "${weather.date?.day}/${weather.date?.month}",
                   style: const TextStyle(color: Colors.white),
                 ),
-                const SizedBox(height:10),
+                Text(
+                  "${weather.date?.hour}:00",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 10),
                 Image.network(
                   "https://openweathermap.org/img/wn/${weather.weatherIcon}@2x.png",
                   width: 50,
                 ),
-                const SizedBox(height:10),
-            Text(
+                const SizedBox(height: 10),
+                Text(
+                  "${weather.temperature?.celsius?.round()}°",
 
-              "${weather.temperature?.celsius?.round()}°",
+                  style: const TextStyle(
+                    color: Colors.white,
 
-              style: const TextStyle(
+                    fontSize: 20,
 
-                color: Colors.white,
-
-                fontSize:20,
-
-                fontWeight:
-                FontWeight.bold,
-
-              ),
-            )
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           );
