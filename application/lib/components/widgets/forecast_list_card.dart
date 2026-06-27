@@ -10,7 +10,7 @@ class ForecastListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 160,
+      height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal, //keo ngang
         itemCount: forecast.length,
