@@ -18,7 +18,7 @@ class ForecastListCard extends StatelessWidget {
           Weather weather = forecast[index];
           return Container(
             width: 110,
-            margin: EdgeInsets.fromLTRB(2, 10, 2, 0),
+            margin: EdgeInsets.fromLTRB(5, 10, 2, 0),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),

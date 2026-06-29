@@ -1,0 +1,57 @@
+﻿Mô tả chức năng:
+Chức năng xem lịch cúp điện trên map:
+Người dùng vào hệ thống -> Map sẽ hiển thị và các điểm bị cúp điện sẽ hiển thị theo các quy tắc sau:
+1. Đối với quy mô cúp điện cấp quận, phường -> tô vàng toàn tỉnh
+2. Đối với quy mô cúp điện theo đường -> tô cam vùng 2 bên đường
+3. Đối với quy mô cúp điện không rõ ràng, địa điểm hoặc mô tả thiếu cụ thể -> Chỉ tạo một nút trên bản đồ -> click vào sẽ hiển thị thông tin chi tiết
+
+Ý tưởng làm:
+Đây là mẫu dữ liệu lấy được từ trang web
+Điện lực:
+Điện lực Quận Ninh Kiều
+Ngày:
+27 tháng 6 năm 2026
+Thời gian:
+Từ 08:00 đến 11:00
+Khu vực:
+Một phần đường Nguyễn Trãi từ đầu đường Trần Văn Khéo đi đến đường Trần Quang Khải, đến hẻm 10, 20, 24, 164 rẽ phải qua đường Trần Phú đến hẻm 42, 56 và đến đầu đường Ung Văn Khiêm. Phường Cái Khế TPCT
+Lý do:
+Bảo trì, sửa chữa lưới điện
+Trạng thái:
+Đã duyệt
+
+Có 2 thông tin quan trọng gặp vấn đề:
++ Khu vực: Khu vực này mô tả không theo quy luật nhất định lúc này lúc khác, đôi lúc sai chính tả, đôi lúc chi tiết, đôi lúc không. Dùng những từ ngữ không thể xác định chính xác như một phần, thuộc nhánh sông, đoạn đường từ A đến B...
++ Thời gian: Do mô tả của khu vực không cụ thể nên dẫn tới việc xác định thời gian cũng không rõ. Kiểu 3 thông báo liên tục đều là: "một phần của khu vực A". Người ngoài nhìn vô sẽ hiểu là tại khu A đó người ta sẽ cúp lần lượt từng phần theo các giờ khác nhau. Nhưng do quy đổi sang tọa độ thì gần như không thể xác định.
+
+=> Cách giải quyết đề xuất: Nếu mô tả không cụ thể hiển thị = tooltip khi người dùng click hoặc hold vào màn hình tại điểm cúp điện.
+
+Vấn đề thứ 2: Hiệu suất
+Thông thường trang web sẽ chỉ cập nhật lại lịch theo ngày, còn trạng thái của lịch cúp điện là (kế hoạch, đã duyệt, đang thực hiện, đã thực hiện). Trạng thái này sẽ hoạt động theo giờ thực tế và những kế hoạch được lên nếu tới ngày vẫn chưa được duyệt thì qua ngày sẽ mất. Thường thì trạng thái đã thực hiện sẽ được tự động start theo giờ bắt đầu. Còn trạng thái đã thực hiện thì tùy vào công việc hoàn thành lúc nào (Trường hợp chậm nhất ghi nhận là thực tế đã hoàn thành vào lúc 4h nhưng tới 9h mới cập nhật hoàn thành)
+
+Ý tưởng ban đầu (realtime):
+- Người dùng vào App, bắt đầu fetch dữ liệu, xong map tọa độ, xong render lên màn hình.
+=> Vấn đề: tốc độ fetch lâu, nhiều thông tin dư thừa, việc fetch trùng lặp thông tin.
+
+Xem xét lại vấn đề, đưa ra giải pháp khác (ETL):
+- Fetch dữ liệu vào đầu và giữa ngày, lưu trữ dữ liệu vào CSDL (dạng Upsert)
+- Khi người dùng vào App, query dữ liệu theo ngày và chỉ hiển thị theo ngày thôi. Người dùng có thể chọn ngày khác.
+- Trạng thái (đang thực hiện và đã thực hiện) sẽ cập nhật theo thời gian bắt đầu và kết thúc. Còn kế hoạch và đã duyệt sẽ được cập nhật theo thời điểm đã lưu.
+=> Giải quyết được vấn đề hiệu suất, dễ thực hiện và hiệu quả vẫn ở mức chấp nhận được.
+Nhược điểm: Một số trường hợp hi hữu sẽ dẫn đến hệ thống cung cấp sai thông tin (Hoàn thành sớm/muộn hơn dự kiến, thời tiết xấu -> không thực hiện theo lịch trình,...) => Có thể chấp nhận được nếu xem tính năng là gần chính xác.
+
+Chức năng xem dự báo thời tiết dựa trên GPS + bản đồ nhiệt độ/ lượng mưa
+
+Luồng hoạt động:
+User nhấp vào biểu tượng Thời tiết bên dưới NavBar -> hệ thống yêu cầu sử dụng định vị GPS -> ứng dụng gọi API thời tiết từ (OpenWeatherAPI), truyền tọa độ hiện tại của thiết bị rồi hiển thị kết quả lên UI cho User.
+Kết quả cơ bản bao gồm:
++ Địa điểm, thành phố, tỉnh thành tại tọa độ hoặc gần tọa độ đó nhất.
++ Nhiệt độ cập nhật theo thời gian thực (thang đo độ C).
++ Mô tả thời tiết cụ thể.
++ Dự báo thời tiết trong vài giờ tới (24h).
+Ngoài ra User có thể nhấp vào biểu tượng Map để xem bản độ nhiệt độ/ lượng mưa các khu vực tỉnh thành ở Việt Nam và trên thế giới (tương tự với web/ app Windy) sử dụng OpenWeatherMap để hiển thị.
+Màu sắc sẽ phụ thuộc vào nhiệt độ tại vị trí đó, nhiệt độ càng cao màu sắc càng đỏ đậm dần và ngược lại nhiệt độ càng thấp màu sắc dần chuyển sang màu xanh đậm dần.
+
+
+
+Cân nhắc sử dụng Stream, Websocket để có thể theo dõi thời tiết 1 theo thời gian thực thay vì phải refresh lại để cập nhật dữ liệu.
