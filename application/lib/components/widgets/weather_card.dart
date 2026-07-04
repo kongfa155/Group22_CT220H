@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
 import 'dart:ui';
 
@@ -12,48 +13,83 @@ class WeatherCard extends StatelessWidget {
     return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 20),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 2,
-                sigmaY: 2,
-              ),
-
-              child: Container(
-                width: 350,
-                height: 320,
+          Container(
+            padding: EdgeInsets.only(top: 20, bottom: 20),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.39), // trong suốt
-                  borderRadius: BorderRadiusGeometry.circular(20),
-                  // boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 10.0,blurStyle: BlurStyle.solid)],
+                  color: Color.fromRGBO(61, 69, 170,0.94),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 10.0,blurStyle: BlurStyle.solid)],
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      "${weather.areaName}",
-                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly, //de tam nhu vay
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(DateFormat('EEEE, dd MMMM').format(weather.date!), style: TextStyle(fontSize: 20, color: Colors.white)),
+                            Text(
+                              "${weather.areaName}",
+                              style: TextStyle(fontSize: 30, color: Colors.white),
+                            ),
+                            Text("${weather.tempMin?.celsius?.round()}°/${weather.tempMax?.celsius?.round()}°",
+                                style: TextStyle(fontSize: 20, color: Colors.white)),
+
+                            Text(
+                              "${weather.weatherDescription}",
+                              style: TextStyle(fontSize: 20, color: Colors.white),
+                            ),
+                          ],
+
+                        ),
+
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.network(
+                              "https://openweathermap.org/img/wn/${weather.weatherIcon}@2x.png",
+                              width: 70,
+                            ),
+                            Text(
+                              "${weather.temperature?.celsius?.round()}°C",
+                              style: TextStyle(fontSize: 40, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    Image.network(
-                      "https://openweathermap.org/img/wn/${weather.weatherIcon}@2x.png",
-                      width: 100,
-                    ),
-                    Text(
-                      "${weather.temperature?.celsius?.round()}°C",
-                      style: TextStyle(fontSize: 60, color: Colors.white),
-                    ),
-                    Text(
-                      "${weather.weatherDescription ?? ""}",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
+                    SizedBox(height: 10,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.water_drop, color: Colors.white),
+                            const SizedBox(width: 6),
+                            Text(
+                              "${weather.humidity}%",
+                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          ],
+                        ),
+
+                        Row(
+                          children: [
+                            Icon(Icons.wind_power_sharp, color: Colors.white),
+                            const SizedBox(width: 6),
+                            Text(
+                              "${weather.windSpeed} m/s",
+                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
-            ),
-          ),
         ],
     );
   }

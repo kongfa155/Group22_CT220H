@@ -36,10 +36,10 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chỗ xem lịch cúp điện'),
-       centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Chỗ xem lịch cúp điện'),
+      //  centerTitle: true,
+      // ),
 
       body: pages[currentPage],
 

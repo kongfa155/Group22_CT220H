@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
 import 'package:application/services/location_service.dart';
 import 'package:geolocator/geolocator.dart';
-import '../components/logicBackground.dart';
+// import '../components/logicBackground.dart';
 import '../components/widgets/forecast_list_card.dart';
 import '../components/widgets/weather_card.dart';
+import '../components/widgets/weather_map_card.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -20,7 +21,7 @@ class _WeatherPageState extends State<WeatherPage> {
       WeatherService(); //goi dich vu thoi tiet
   final LocationService _locationService = LocationService();
   final WeatherForecast _weatherForecast = WeatherForecast();
-
+  // final WeatherMapService _mapService = WeatherMapService();
   @override
   void initState() {
     super.initState();
@@ -52,7 +53,13 @@ class _WeatherPageState extends State<WeatherPage> {
   List<Weather>? _forecast; //doi tuong luu danh sach cac du bao trong 5 ngay
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: MyPageWeatherForecast());
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Dự báo thời tiết"),
+        centerTitle: true,
+      ),
+      body: MyPageWeatherForecast(), 
+      extendBody: true,);
   }
 
   Widget MyPageWeatherForecast() {
@@ -73,18 +80,21 @@ class _WeatherPageState extends State<WeatherPage> {
       height: MediaQuery.sizeOf(context).height,
       width: MediaQuery.sizeOf(context).width,
       child: Container(
-          width: MediaQuery.sizeOf(context).width,
-          height: MediaQuery.sizeOf(context).height,
+        width: MediaQuery.sizeOf(context).width,
+        height: MediaQuery.sizeOf(context).height,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                getBackground(_weather!.weatherMain ?? "clear"),
-              ),
-              fit: BoxFit.cover,
-            ),
+          //   image: DecorationImage(
+          //
+          //     image: AssetImage(
+          //       getBackground(_weather!.weatherMain ?? "clear"),
+          //     ),
+          //     fit: BoxFit.cover,
+          //   ),
+            color: Color(0xFFFFF6F6)
           ),
-        child: SingleChildScrollView(
-          child: Column(
+        child: ListView(
+          // padding: const EdgeInsets.only(top: 50, bottom: 30),
+          padding: const EdgeInsets.only(bottom: 30),
             children: [
               WeatherCard(
                 weather: _weather!, //truyen tham so weather
@@ -93,8 +103,8 @@ class _WeatherPageState extends State<WeatherPage> {
                 forecast:
                     _forecast!, //Them dau cham than de bao chac chan khong null
               ),
+              WeatherMapCard(),
             ],
-          ),
         ),
       ),
     );

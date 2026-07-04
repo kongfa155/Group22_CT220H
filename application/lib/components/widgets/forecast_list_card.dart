@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
 import 'dart:ui';
+import 'package:intl/intl.dart';
 
 class ForecastListCard extends StatelessWidget {
   final List<Weather> forecast;
@@ -17,40 +18,35 @@ class ForecastListCard extends StatelessWidget {
         itemBuilder: (context, index) {
           Weather weather = forecast[index];
           return Container(
-            width: 110,
+            width: 82,
             margin: EdgeInsets.fromLTRB(5, 10, 2, 0),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Color.fromRGBO(61, 69, 170, 0.94),
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 10.0,blurStyle: BlurStyle.solid)],
             ),
-            padding: EdgeInsets.all(8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "${weather.date?.day}/${weather.date?.month}",
+                  DateFormat("E").format(weather.date!),
                   style: const TextStyle(color: Colors.white),
                 ),
-                Text(
-                  "${weather.date?.hour}:00",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                const SizedBox(height: 10),
                 Image.network(
                   "https://openweathermap.org/img/wn/${weather.weatherIcon}@2x.png",
                   width: 50,
                 ),
-                const SizedBox(height: 10),
                 Text(
                   "${weather.temperature?.celsius?.round()}°",
-
                   style: const TextStyle(
                     color: Colors.white,
-
                     fontSize: 20,
-
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+                Text(
+                  DateFormat('h:mm a').format(weather.date!),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
