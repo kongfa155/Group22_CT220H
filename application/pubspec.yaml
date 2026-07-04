@@ -43,6 +43,7 @@ dependencies:
   latlong2: ^0.9.1
   geolocator: ^13.0.1 #thu vien lay toa do vi tri hien tai cua user
   flutter_dotenv: ^5.1.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +55,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon_app.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/icon_app.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -14,6 +14,7 @@ class WeatherCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
+            margin: EdgeInsets.only(right: 10, left: 10),
             padding: EdgeInsets.only(top: 20, bottom: 20),
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(61, 69, 170,0.94),
