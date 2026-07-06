@@ -137,6 +137,9 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+# Ignore tất cả file env ở mọi thư mục
+**/.env
+**/.env.*
 
 # File build và cache (Tạo tự động khi chạy app/test)
 dist/
