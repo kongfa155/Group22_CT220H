@@ -2,7 +2,7 @@
 
 require("dotenv").config();
 //Kết nối db
-const pool = require("../config/db"); 
+const pool = require("../config/db");
 const { fetchAllSources } = require("../services/sourceFetcher");
 const { extractRecords } = require("../services/recordExtractor");
 const { toPostgresDate, toPostgresTime } = require("../utils/parseNormalizedDatetime");
@@ -16,7 +16,7 @@ async function insertRecord(record, source) {
     const startTime = toPostgresTime(record.time_start);
     const endTime = toPostgresTime(record.time_end);
 
-// Tính hash ở đây, TRƯỚC khi insert 
+    // Tính hash ở đây, TRƯỚC khi insert 
     const contentHash = computeContentHash({
         powerCompany: record.power_company,
         areaText: record.area,
@@ -48,42 +48,39 @@ async function insertRecord(record, source) {
         ]
     );
 }
+const pLimit = require("p-limit").default;
 
 async function run() {
     console.log("[scrapeAllSources] Bắt đầu fetch cả 3 nguồn...");
-    const chunks = await fetchAllSources(); //Fetch dữ liệu từ web
+    const chunks = await fetchAllSources();
     console.log(`[scrapeAllSources] Fetch xong, có ${chunks.length} chunk cần trích xuất`);
 
     let totalRecords = 0;
     let failedChunks = 0;
 
-    // Xử lý tuần tự để không spam Gemini API cùng lúc (giống job xử lý staging)
-    for (const chunk of chunks) {
-        try {
-            //Duyệt từng chunk và gọi gemini
-            const records = await extractRecords(chunk.rawText);
+    // Chỉ cho phép tối đa 4 request Gemini chạy đồng thời
+    const limit = pLimit(4);
 
-            for (const record of records) {
-                //Duyệt từng record và thêm vào csdl
-                await insertRecord(record, chunk.source);
-                totalRecords++;
+    const tasks = chunks.map((chunk) => {
+        return limit(async () => {
+            try {
+                const records = await extractRecords(chunk.rawText);
+                for (const record of records) {
+                    await insertRecord(record, chunk.source);
+                    totalRecords++;
+                }
+                console.log(`[scrapeAllSources] ${chunk.source}: ${records.length} record`);
+            } catch (err) {
+                failedChunks++;
+                console.error(`[scrapeAllSources] Lỗi chunk (${chunk.source}):`, err.message);
             }
+        });
+    });
 
-            console.log(
-                `[scrapeAllSources] ${chunk.source}${chunk.districtHint ? " - " + chunk.districtHint : ""}: ${records.length} record`
-            );
-        } catch (err) {
-            failedChunks++;
-            console.error(
-                `[scrapeAllSources] Lỗi xử lý chunk (source=${chunk.source}, huyện=${chunk.districtHint}):`,
-                err.message
-            );
-        }
-    }
+    // Chờ tất cả các task trong hàng đợi hoàn thành
+    await Promise.all(tasks);
 
-    console.log(
-        `[scrapeAllSources] Hoàn tất: ${totalRecords} record đã lưu, ${failedChunks} chunk lỗi / ${chunks.length} chunk`
-    );
+    console.log(`[scrapeAllSources] Hoàn tất: ${totalRecords} record đã lưu, ${failedChunks} chunk lỗi`);
 }
 
 //Nếu có lỡ import từ file khác thì nó sẽ không tự chạy hàm, chỉ khi đích thân hàm được gọi thì mới chạy

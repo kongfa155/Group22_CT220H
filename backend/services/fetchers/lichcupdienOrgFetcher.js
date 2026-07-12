@@ -9,7 +9,7 @@ const sources = require("../../config/sources");
 //  hàm trả về mảng rỗng thay vì throw - để job gọi hàm này biết mà fallback
 //  (ví dụ gửi nguyên `$('body').text()` cho AI) thay vì crash cả batch.
 
-async function fetchLichcupdienOrg() {
+async function fetchLichcupdienOrg({ batchSize = 30 } = {}) {
     const config = sources.lichcupdien_org;
     //Busted cache dùng để thêm tham số thời gian nhằm lấy dữ liệu mới nhất, đề phòng việc lấy dữ liệu cũ
     const bustedUrl = `${config.url}?_cb=${Date.now()}`;
@@ -30,11 +30,16 @@ async function fetchLichcupdienOrg() {
     }
 
     // Gom mỗi 6 dòng liên tiếp thành 1 chunk (company, date, time, area, reason, status)
-    const chunks = [];
+    const outages = [];
     for (let i = 0; i + 5 < items.length; i += 6) {
-        chunks.push(items.slice(i, i + 6).join("\n"));
+        outages.push(items.slice(i, i + 6).join("\n"));
     }
 
+    // gộp nhiều outage thành 1 chunk lớn, cách nhau bằng dòng trống để AI dễ phân biệt ranh giới giữa các outage khi đọc.
+    const chunks = [];
+    for (let i = 0; i < outages.length; i += batchSize) {
+        chunks.push(outages.slice(i, i + batchSize).join("\n\n"));
+    }
     return { chunks, fallbackFullText: null };
 }
 
