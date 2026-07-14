@@ -72,6 +72,10 @@ async function run() {
     );
 
     console.log(`[processRawToStaging] Tìm thấy ${unprocessed.length} record chưa xử lý`);
+    console.log(
+        `[processRawToStaging] Do giới hạn 5 request/phút của Gemini free tier, ` +
+        `ước tính mất khoảng ${Math.ceil((unprocessed.length * 13) / 60)} phút để xử lý hết batch này.`
+    );
 
     let success = 0;
     let failed = 0;

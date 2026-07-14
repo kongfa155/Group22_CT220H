@@ -41,7 +41,40 @@ Input: "Một phần đường Nguyễn Trãi từ đầu đường Trần Văn 
 Output: {"scale":"road","ward":"Cái Khế","subarea":null,"streets":["Nguyễn Trãi","Trần Phú"],"from_landmark":"đường Trần Văn Khéo","to_landmark":"đường Ung Văn Khiêm","confidence":"exact"}
 `.trim();
 
-async function extractAreaInfo(areaText) {
+// Free tier Gemini giới hạn 5 request/phút cho gemini-2.5-flash.
+// Giãn cách tối thiểu giữa các lần gọi để không vượt limit ngay từ đầu -
+// 60000ms / 5 = 12000ms, cộng thêm biên an toàn thành 13000ms.
+const MIN_INTERVAL_MS = Number(process.env.GEMINI_MIN_INTERVAL_MS || 13000);
+let lastCallAt = 0;
+
+async function throttle() {
+    const now = Date.now();
+    const wait = lastCallAt + MIN_INTERVAL_MS - now;
+    if (wait > 0) {
+        await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+    lastCallAt = Date.now();
+}
+
+/**
+ * Đọc số giây "retryDelay" mà Google đề xuất trong response lỗi 429,
+ * ví dụ: { "@type": "...RetryInfo", "retryDelay": "56s" }.
+ * Trả về null nếu không tìm thấy (dùng backoff mặc định thay thế).
+ */
+function parseRetryDelaySeconds(errText) {
+    try {
+        const parsed = JSON.parse(errText);
+        const detail = parsed?.error?.details?.find((d) => d.retryDelay);
+        if (detail?.retryDelay) {
+            return parseFloat(detail.retryDelay.replace("s", ""));
+        }
+    } catch (e) {
+        // errText không phải JSON hợp lệ - bỏ qua, dùng backoff mặc định
+    }
+    return null;
+}
+
+async function extractAreaInfo(areaText, { maxRetries = 5 } = {}) {
     const body = {
         contents: [
             {
@@ -55,32 +88,53 @@ async function extractAreaInfo(areaText) {
         }
     };
 
-    const response = await fetch(GEMINI_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": process.env.GEMINI_API_KEY
-        },
-        body: JSON.stringify(body)
-    });
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        await throttle(); // luôn giãn cách trước mỗi lần gọi, kể cả lần đầu
 
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Gemini API lỗi ${response.status}: ${errText}`);
+        const response = await fetch(GEMINI_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": process.env.GEMINI_API_KEY
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+
+            // 429 (rate limit) hoặc 503 (quá tải tạm thời) đáng để thử lại
+            if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
+                const suggestedDelay = parseRetryDelaySeconds(errText);
+                const delayMs = suggestedDelay
+                    ? Math.ceil(suggestedDelay * 1000) + 1000 // +1s đệm an toàn
+                    : attempt * 5000; // fallback nếu không đọc được retryDelay
+
+                console.warn(
+                    `[geminiExtractor] Lỗi ${response.status} (lần ${attempt}/${maxRetries}), đợi ${delayMs}ms rồi thử lại...`
+                );
+                await new Promise((resolve) => setTimeout(resolve, delayMs));
+                continue;
+            }
+
+            throw new Error(`Gemini API lỗi ${response.status}: ${errText}`);
+        }
+
+        const data = await response.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!rawText) {
+            throw new Error("Gemini không trả về nội dung hợp lệ");
+        }
+
+        try {
+            return JSON.parse(rawText);
+        } catch (e) {
+            throw new Error(`Không parse được JSON từ Gemini: ${rawText}`);
+        }
     }
 
-    const data = await response.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!rawText) {
-        throw new Error("Gemini không trả về nội dung hợp lệ");
-    }
-
-    try {
-        return JSON.parse(rawText);
-    } catch (e) {
-        throw new Error(`Không parse được JSON từ Gemini: ${rawText}`);
-    }
+    throw new Error(`Vượt quá số lần thử lại (${maxRetries}) cho area_text: ${areaText}`);
 }
 
 module.exports = { extractAreaInfo };
