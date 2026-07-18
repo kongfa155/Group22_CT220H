@@ -137,4 +137,100 @@ async function extractAreaInfo(areaText, { maxRetries = 5 } = {}) {
     throw new Error(`Vượt quá số lần thử lại (${maxRetries}) cho area_text: ${areaText}`);
 }
 
-module.exports = { extractAreaInfo };
+// ============================================================
+// XỬ LÝ THEO LÔ (BATCH) - giải quyết quota thấp (free tier: 20
+// request/ngày). Thay vì 1 area_text = 1 request, gộp nhiều
+// area_text vào CÙNG 1 request, Gemini trả về 1 mảng kết quả
+// theo đúng thứ tự. VD: batch 15 record -> 1 request thay vì 15.
+// ============================================================
+const BATCH_SYSTEM_PROMPT = `
+${SYSTEM_PROMPT}
+
+QUAN TRỌNG: bạn sẽ nhận được một MẢNG các mô tả khu vực (area_text),
+không phải 1 mô tả đơn. Với MỖI phần tử trong mảng, áp dụng đúng quy
+tắc phân tích ở trên. Trả về một MẢNG JSON, mỗi phần tử là 1 object
+theo schema ở trên - PHẢI có ĐÚNG SỐ LƯỢNG phần tử bằng số lượng input,
+và ĐÚNG THỨ TỰ tương ứng (phần tử thứ i của output ứng với phần tử thứ i
+của input). Không bỏ sót, không gộp 2 input thành 1 output.
+`.trim();
+
+/**
+ * Gộp nhiều area_text vào 1 request. Trả về mảng kết quả cùng thứ tự
+ * với areaTextArray. Nếu Gemini trả sai số lượng phần tử (hiếm khi
+ * xảy ra nhưng có thể xảy ra với batch quá lớn), throw lỗi để caller
+ * tự quyết định chia nhỏ batch và thử lại.
+ */
+async function extractAreaInfoBatch(areaTextArray, { maxRetries = 5 } = {}) {
+    if (areaTextArray.length === 0) return [];
+
+    const inputJson = JSON.stringify(areaTextArray, null, 2);
+    const body = {
+        contents: [
+            {
+                role: "user",
+                parts: [{ text: `${BATCH_SYSTEM_PROMPT}\n\nInput (mảng ${areaTextArray.length} phần tử):\n${inputJson}\n\nOutput:` }]
+            }
+        ],
+        generationConfig: {
+            temperature: 0,
+            responseMimeType: "application/json"
+        }
+    };
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        await throttle();
+
+        const response = await fetch(GEMINI_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": process.env.GEMINI_API_KEY
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+
+            if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
+                const suggestedDelay = parseRetryDelaySeconds(errText);
+                const delayMs = suggestedDelay ? Math.ceil(suggestedDelay * 1000) + 1000 : attempt * 5000;
+                console.warn(
+                    `[geminiExtractor] Batch lỗi ${response.status} (lần ${attempt}/${maxRetries}), đợi ${delayMs}ms...`
+                );
+                await new Promise((resolve) => setTimeout(resolve, delayMs));
+                continue;
+            }
+
+            throw new Error(`Gemini API lỗi ${response.status}: ${errText}`);
+        }
+
+        const data = await response.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!rawText) {
+            throw new Error("Gemini không trả về nội dung hợp lệ (batch)");
+        }
+
+        let parsed;
+        try {
+            parsed = JSON.parse(rawText);
+        } catch (e) {
+            throw new Error(`Không parse được JSON từ Gemini (batch): ${rawText}`);
+        }
+
+        if (!Array.isArray(parsed) || parsed.length !== areaTextArray.length) {
+            throw new Error(
+                `Gemini trả về sai số lượng phần tử: mong đợi ${areaTextArray.length}, nhận được ${
+                    Array.isArray(parsed) ? parsed.length : "không phải mảng"
+                }`
+            );
+        }
+
+        return parsed;
+    }
+
+    throw new Error(`Vượt quá số lần thử lại (${maxRetries}) cho batch ${areaTextArray.length} record`);
+}
+
+module.exports = { extractAreaInfo, extractAreaInfoBatch };
