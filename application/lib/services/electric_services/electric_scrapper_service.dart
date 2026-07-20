@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:application/models/ElectricItem.dart';
-import 'package:application/services/outage_api_service.dart';
+import 'package:application/services/electric_services/outage_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;

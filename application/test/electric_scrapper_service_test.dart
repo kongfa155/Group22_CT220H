@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:application/services/electric_scrapper_service.dart';
+import 'package:application/services/electric_services/electric_scrapper_service.dart';
 
 void main() {
   test('Get electric data', () async {

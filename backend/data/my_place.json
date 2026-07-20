@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Tên bạn tự đặt",
+    "normalized_name": "ten ban tu dat",
+    "aliases": ["Tên khác nếu có"],
+    "type": "Khu dân cư",
+    "parent_adm": "Phường XYZ, Quận ABC, Thành phố Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [105.xxxx, 10.xxxx],
+            [105.xxxx, 10.xxxx],
+            [105.xxxx, 10.xxxx],
+            [105.xxxx, 10.xxxx],
+            [105.xxxx, 10.xxxx]
+          ]
+        ]
+      ]
+    }
+  }
+]
