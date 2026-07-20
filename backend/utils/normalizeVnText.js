@@ -13,4 +13,8 @@ function normalizeVnText(text) {
         .trim();
 }
 
-module.exports = { normalizeVnText };
+function normalizeRoadKey(text) {
+    return normalizeVnText(text).replace(/^duong\s+/, "").trim();
+}
+
+module.exports = { normalizeVnText, normalizeRoadKey};

@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Đường Nguyễn Văn Cừ nối dài",
+    "normalized_name": "duong nguyen van cu noi dai",
+    "aliases": [],
+    "parent_name": "Phường Tân An, Quận Ninh Kiều, Thành phố Cần Thơ",
+    "geom": {
+      "type": "LineString",
+      "coordinates": [
+        [105.xxxx, 10.xxxx],
+        [105.xxxx, 10.xxxx],
+        [105.xxxx, 10.xxxx]
+      ]
+    }
+  }
+]

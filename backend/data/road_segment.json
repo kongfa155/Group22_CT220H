@@ -1,0 +1,134 @@
+
+
+
+[
+{
+"name": "Đường Nguyễn Văn Cừ",
+"normalized_name": "duong nguyen van cu",
+"aliases": ["Nguyễn Văn Cừ nối dài"],
+"parent_name": "Quận Ninh Kiều, Thành phố Cần Thơ",
+"geom": {
+"type": "LineString",
+"coordinates": [
+  [
+    105.78366924470349,
+    10.06116054940933
+  ],
+  [
+    105.7522091,
+    10.0306848
+  ],
+  [
+    105.752154,
+    10.0307741
+  ]
+]
+}
+}
+,
+  {
+    "name": "Đường Nguyễn Văn Cừ nối dài",
+    "normalized_name": "duong nguyen van cu noi dai",
+    "aliases": [
+      "Nguyễn Văn Cừ",
+      "Đường tỉnh 923",
+      "Đường NVC nối dài"
+    ],
+    "parent_name": "Phường An Khánh & Phường Long Tuyền, Quận Ninh Kiều & Bình Thủy, Thành phố Cần Thơ",
+    "metadata": {
+      "road_type": "Đường đô thị / Trục chính",
+      "length_approx": "Cả tuyến hơn 10km (đoạn nối dài khoảng 5-6km)",
+      "key_landmarks": [
+        "Bệnh viện Nhi Đồng Cần Thơ",
+        "Bệnh viện Đa khoa Trung ương Cần Thơ",
+        "Trường Đại học Y Dược Cần Thơ",
+        "Trường Đại học FPT Cần Thơ",
+        "Trường Đại học Nam Cần Thơ"
+      ],
+      "description": "Tuyến đường huyết mạch kết nối trung tâm thành phố Cần Thơ với các khu đô thị mới, cụm trường đại học và bệnh viện lớn, hướng đi huyện Phong Điền."
+    },
+    "geom": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          105.7520419,
+          10.0304834
+        ],
+        [
+          105.7257224,
+          10.0064058
+        ],
+        [
+          105.7220529,
+          10.0043159
+        ],
+        [
+          105.7192739,
+          10.0023418
+        ],
+        [
+          105.7116327,
+          9.991647
+        ],
+        [
+          105.7103847,
+          9.9907641
+        ],
+        [
+          105.7097052,
+          9.9906154
+        ],
+        [
+          105.697656,
+          9.9907586
+        ],
+        [
+          105.696522,
+          9.9906265
+        ],
+        [
+          105.6932728,
+          9.9898589
+        ],
+        [
+          105.6927343,
+          9.9898363
+        ],
+        [
+          105.6920238,
+          9.9899507
+        ],
+        [
+          105.6871642,
+          9.9918012
+        ],
+        [
+          105.6859917,
+          9.992506
+        ],
+        [
+          105.6798942,
+          9.9983772
+        ],
+        [
+          105.6791651,
+          9.9987179
+        ],
+        [
+          105.6717124,
+          9.9986488
+        ],
+        [
+          105.6708116,
+          9.9989729
+        ],
+        [
+          105.6682896,
+          10.000973
+        ]
+      ]
+    }
+  }
+]
+
+

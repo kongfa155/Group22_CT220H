@@ -27,7 +27,8 @@ class _ElectricPageState extends State<ElectricPage> {
   final MapController _mapController = MapController();
 
   List<BoundaryFeature> _boundaries = [];
-  List<OutageWardGroup> _outageGroups = [];
+  List<OutagePointGroup> _outagePoints = [];
+  List<OutageRoadSegment> _outageRoads = [];
   bool _loading = true;
   String? _error;
 
@@ -40,14 +41,15 @@ class _ElectricPageState extends State<ElectricPage> {
   Future<void> _loadData() async {
     try {
       final boundariesFuture = BoundaryApiService.getAllBoundaries();
-      final outagesFuture = OutageMapApiService.getOutagesByWard();
+      final outageFuture = OutageMapApiService.getOutagesByWard();
 
       final boundaries = await boundariesFuture;
-      final outageGroups = await outagesFuture;
+      final outageResult = await outageFuture;
 
       setState(() {
         _boundaries = boundaries;
-        _outageGroups = outageGroups;
+        _outagePoints = outageResult.points;
+        _outageRoads = outageResult.roads;
         _loading = false;
       });
     } catch (err) {
@@ -72,7 +74,7 @@ class _ElectricPageState extends State<ElectricPage> {
     );
   }
 
-  void _showOutageDetails(OutageWardGroup group) {
+  void _showOutageDetails(OutagePointGroup group) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -94,16 +96,16 @@ class _ElectricPageState extends State<ElectricPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          group.wardName,
+                          group.label,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      if (group.isApproximateLocation)
+                      if (group.precision != 'point')
                         const Tooltip(
-                          message: 'Vị trí gần đúng (chưa xác định chi tiết khu vực)',
+                          message: 'Vị trí gần đúng (trung tâm khu vực hành chính, chưa xác định chi tiết)',
                           child: Icon(Icons.info_outline, size: 18, color: Colors.orange),
                         ),
                     ],
@@ -163,9 +165,17 @@ class _ElectricPageState extends State<ElectricPage> {
                     ),
                   );
                 }).toList(),
+              ),PolylineLayer(
+                polylines: _outageRoads.map((road) {
+                  return Polyline(
+                    points: road.points,
+                    color: road.color == 'yellow' ? Colors.amber : Colors.deepOrange,
+                    strokeWidth: 5,
+                  );
+                }).toList(),
               ),
               MarkerLayer(
-                markers: _outageGroups.map((group) {
+                markers: _outagePoints.map((group) {
                   return Marker(
                     point: LatLng(group.lat, group.lng),
                     width: 40,
@@ -174,9 +184,7 @@ class _ElectricPageState extends State<ElectricPage> {
                       onTap: () => _showOutageDetails(group),
                       child: Icon(
                         Icons.bolt,
-                        color: group.isApproximateLocation
-                            ? Colors.orange
-                            : Colors.red,
+                        color: group.precision == 'point' ? Colors.red : Colors.orange,
                         size: 32,
                         shadows: const [
                           Shadow(color: Colors.black45, blurRadius: 4),
