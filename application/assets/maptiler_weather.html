@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+
+    <link
+            href="https://cdn.maptiler.com/maptiler-sdk-js/v3.6.1/maptiler-sdk.css"
+            rel="stylesheet">
+
+
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.6.1/maptiler-sdk.umd.min.js">
+    </script>
+
+
+    <style>
+
+        html,
+        body,
+        #map {
+
+        width:100%;
+        height:100%;
+        margin:0;
+        padding:0;
+
+        }
+
+
+        #weather-menu {
+
+        position:absolute;
+
+        top:20px;
+        left:20px;
+
+        z-index:10;
+
+        background:white;
+
+        padding:10px;
+
+        border-radius:15px;
+
+        box-shadow:0 4px 15px rgba(0,0,0,.25);
+
+        font-family:sans-serif;
+
+        }
+
+
+
+        button {
+
+        border:none;
+
+        background:#f1f5f9;
+
+        padding:8px 12px;
+
+        margin:3px;
+
+        border-radius:10px;
+
+        font-weight:bold;
+
+        }
+
+
+
+        button.active {
+
+        background:#dbeafe;
+
+        color:#2563eb;
+
+        }
+
+
+    </style>
+
+
+</head>
+
+
+
+<body>
+
+
+<div id="map"></div>
+
+
+
+<div id="weather-menu">
+
+
+    <button id="temp"
+            onclick="changeLayer('temp')">
+
+        🌡 Nhiệt độ
+
+    </button>
+
+
+    <button
+            onclick="changeLayer('rain')">
+
+        🌧 Mưa
+
+    </button>
+
+
+    <button
+            onclick="changeLayer('cloud')">
+
+        ☁ Mây
+
+    </button>
+
+
+    <button
+            onclick="changeLayer('wind')">
+
+        💨 Gió
+
+    </button>
+
+
+</div>
+
+
+
+
+<script>
+
+
+    let map;
+
+    let weatherLayerId = null;
+
+    let weatherKey;
+
+
+
+    function initializeMap(
+mapKey,
+openWeatherKey
+){
+
+weatherKey = openWeatherKey;
+
+maptilersdk.config.apiKey = mapKey;
+
+
+
+    map = new maptilersdk.Map({
+
+
+    container:"map",
+
+
+    style:maptilersdk.MapStyle.STREETS,
+
+
+    center:[
+
+    105.7469,
+
+    10.0452
+
+    ],
+
+
+    zoom:5.5
+
+
+    });
+
+
+
+    map.on("load",()=>{
+
+
+    console.log("MAP READY");
+
+    changeLayer("temp");
+
+
+    });
+
+
+
+    }
+
+
+
+
+
+
+    function changeLayer(type){
+
+
+    if(weatherLayerId){
+
+
+    if(map.getLayer(weatherLayerId)){
+
+    map.removeLayer(weatherLayerId);
+
+    }
+
+
+    if(map.getSource(weatherLayerId)){
+
+    map.removeSource(weatherLayerId);
+
+    }
+
+
+    }
+
+
+
+
+    let layerName;
+
+
+
+    switch(type){
+
+
+    case "temp":
+
+    layerName="temp_new";
+
+    break;
+
+
+    case "rain":
+
+    layerName="precipitation_new";
+
+    break;
+
+
+    case "cloud":
+
+    layerName="clouds_new";
+
+    break;
+
+
+    case "wind":
+
+    layerName="wind_new";
+
+    break;
+
+
+    }
+
+
+
+
+    let sourceId =
+    "weather-source";
+
+
+
+    weatherLayerId =
+    "weather-layer";
+
+
+
+
+    map.addSource(sourceId,{
+
+
+    type:"raster",
+
+
+    tiles:[
+
+    `https://tile.openweathermap.org/map/${layerName}/{z}/{x}/{y}.png?appid=${weatherKey}`
+
+    ],
+
+
+    tileSize:256
+
+
+    });
+
+
+
+    map.addLayer({
+
+
+    id:weatherLayerId,
+
+
+    type:"raster",
+
+
+    source:sourceId,
+
+
+    paint:{
+
+
+    "raster-opacity":0.65
+
+
+    }
+    });
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>

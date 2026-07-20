@@ -2,7 +2,8 @@
     <!--Them 2 cai nay vo de xin quyen truy cap vi tri hien tai -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
+    <!--Them 2 cai nay vo de xin quyen truy cap internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="application"
         android:name="${applicationName}"

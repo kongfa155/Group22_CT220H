@@ -44,6 +44,7 @@ dependencies:
   geolocator: ^13.0.1 #thu vien lay toa do vi tri hien tai cua user
   flutter_dotenv: ^5.1.0
   flutter_launcher_icons: ^0.14.4
+  webview_flutter: ^4.14.1
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
+    - assets/maptiler_weather.html
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

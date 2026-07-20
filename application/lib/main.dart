@@ -3,8 +3,17 @@ import 'pages/electric_page.dart';
 import 'pages/weather_page.dart';
 
 void main() {
-  runApp(const MyApp());
-}
+    const mapTilerKey = String.fromEnvironment('MAPTILER_KEY');
+
+    assert(
+    mapTilerKey.isNotEmpty,
+    'Thiếu MAPTILER_KEY. '
+        'Hãy chạy bằng --dart-define=MAPTILER_KEY=...',
+    );
+
+    runApp(const MyApp());
+  }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
