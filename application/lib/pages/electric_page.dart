@@ -7,6 +7,32 @@ import '../models/OutageItem.dart';
 import '../services/electric_services/boundary_api_service.dart';
 import '../services/electric_services/outage_map_api_service.dart';
 
+// Tính khoảng cách (mét) từ 1 điểm đến 1 đoạn thẳng a-b, dùng phép chiếu
+// phẳng đơn giản (đủ chính xác cho khoảng cách nhỏ trong phạm vi TP Cần Thơ,
+// không cần chính xác tuyệt đối như geodesic thật).
+double _pointToSegmentDistanceMeters(LatLng p, LatLng a, LatLng b) {
+  const metersPerDegreeLat = 111320.0;
+  final metersPerDegreeLng = 111320.0 * cos(a.latitude * pi / 180);
+
+  double toX(LatLng point) => (point.longitude - a.longitude) * metersPerDegreeLng;
+  double toY(LatLng point) => (point.latitude - a.latitude) * metersPerDegreeLat;
+
+  final px = toX(p), py = toY(p);
+  final bx = toX(b), by = toY(b);
+
+  final lengthSquared = bx * bx + by * by;
+  double t = lengthSquared == 0 ? 0 : (px * bx + py * by) / lengthSquared;
+  t = t.clamp(0.0, 1.0);
+
+  final projX = t * bx;
+  final projY = t * by;
+
+  final dx = px - projX;
+  final dy = py - projY;
+  return sqrt(dx * dx + dy * dy);
+}
+
+
 class ElectricPage extends StatefulWidget {
   const ElectricPage({super.key});
 
@@ -36,6 +62,19 @@ class _ElectricPageState extends State<ElectricPage> {
   void initState() {
     super.initState();
     _loadData();
+  }
+  List<OutageRoadSegment> _findRoadsNearPoint(LatLng tapPoint, {double thresholdMeters = 25}) {
+    final matches = <OutageRoadSegment>[];
+    for (final road in _outageRoads) {
+      for (int i = 0; i < road.points.length - 1; i++) {
+        final dist = _pointToSegmentDistanceMeters(tapPoint, road.points[i], road.points[i + 1]);
+        if (dist <= thresholdMeters) {
+          matches.add(road);
+          break; // đã match đoạn này, không cần kiểm tra tiếp các đoạn còn lại của road
+        }
+      }
+    }
+    return matches;
   }
 
   Future<void> _loadData() async {
@@ -132,7 +171,46 @@ class _ElectricPageState extends State<ElectricPage> {
     );
   }
 
-
+  void _showRoadDetails(List<OutageRoadSegment> roads) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    roads.first.label,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: ListView.separated(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(12),
+                    itemCount: roads.length,
+                    separatorBuilder: (_, __) => const Divider(height: 24),
+                    itemBuilder: (context, index) => _OutageDetailTile(outage: roads[index].outage),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,6 +224,12 @@ class _ElectricPageState extends State<ElectricPage> {
               minZoom: 8,
               maxZoom: 18,
               cameraConstraint: CameraConstraint.contain(bounds: canThoBounds),
+              onTap: (tapPosition, point) {
+                final roads = _findRoadsNearPoint(point);
+                if (roads.isNotEmpty) {
+                  _showRoadDetails(roads);
+                }
+              },
             ),
             children: [
               TileLayer(
