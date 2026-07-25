@@ -1,6 +1,6 @@
 import 'package:latlong2/latlong.dart';
 
-class OutageItem {
+class OutageDetailItem {
   final String? subareaName;
   final String? roadName;
   final String? powerCompany;
@@ -10,7 +10,7 @@ class OutageItem {
   final String? startTime;
   final String? endTime;
 
-  OutageItem({
+  OutageDetailItem({
     this.subareaName,
     this.roadName,
     this.powerCompany,
@@ -21,8 +21,8 @@ class OutageItem {
     this.endTime,
   });
 
-  factory OutageItem.fromJson(Map<String, dynamic> json) {
-    return OutageItem(
+  factory OutageDetailItem.fromJson(Map<String, dynamic> json) {
+    return OutageDetailItem(
       subareaName: json['subareaName'] as String?,
       roadName: json['roadName'] as String?,
       powerCompany: json['powerCompany'] as String?,
@@ -46,7 +46,7 @@ class OutagePointGroup {
   final double lat;
   final double lng;
   final String precision; // "point" | "ward" | "district"
-  final List<OutageItem> outages;
+  final List<OutageDetailItem> outages;
 
   OutagePointGroup({
     required this.label,
@@ -63,45 +63,46 @@ class OutagePointGroup {
       lat: (json['lat'] as num).toDouble(),
       lng: (json['lng'] as num).toDouble(),
       precision: json['precision']?.toString() ?? 'ward',
-      outages: outagesJson.map((o) => OutageItem.fromJson(o as Map<String, dynamic>)).toList(),
+      outages: outagesJson.map((o) => OutageDetailItem.fromJson(o as Map<String, dynamic>)).toList(),
     );
   }
 }
 
-// Đoạn đường có cúp điện, vẽ bằng polyline
-class OutageRoadSegment {
+// Vùng tô màu (đường đã buffer hoặc khu vực/place_geometries)
+class OutageAreaFeature {
   final String label;
   final String color; // "yellow" | "orange"
-  final List<LatLng> points;
-  final OutageItem outage;
+  final List<List<LatLng>> polygons;
+  final OutageDetailItem outage;
 
-  OutageRoadSegment({
+  OutageAreaFeature({
     required this.label,
     required this.color,
-    required this.points,
+    required this.polygons,
     required this.outage,
   });
 
-  factory OutageRoadSegment.fromJson(Map<String, dynamic> json) {
+  factory OutageAreaFeature.fromJson(Map<String, dynamic> json) {
     final geometry = json['geometry'] as Map<String, dynamic>;
     final type = geometry['type'] as String;
     final coords = geometry['coordinates'] as List;
 
-    List<LatLng> points = [];
-    if (type == 'LineString') {
-      points = (coords).map((p) => LatLng((p[1] as num).toDouble(), (p[0] as num).toDouble())).toList();
-    } else if (type == 'MultiLineString') {
-      // Gộp các đoạn con lại vẽ liền (đơn giản hoá - đủ dùng cho hiển thị)
-      for (final line in coords) {
-        points.addAll((line as List).map((p) => LatLng((p[1] as num).toDouble(), (p[0] as num).toDouble())));
-      }
+    List<List<LatLng>> polygons = [];
+    if (type == 'Polygon') {
+      polygons = [_ringToLatLng(coords[0] as List)];
+    } else if (type == 'MultiPolygon') {
+      polygons = (coords).map((p) => _ringToLatLng((p as List)[0] as List)).toList();
     }
 
-    return OutageRoadSegment(
+    return OutageAreaFeature(
       label: json['label']?.toString() ?? '',
       color: json['color']?.toString() ?? 'yellow',
-      points: points,
-      outage: OutageItem.fromJson(json['outage'] as Map<String, dynamic>),
+      polygons: polygons,
+      outage: OutageDetailItem.fromJson(json['outage'] as Map<String, dynamic>),
     );
+  }
+
+  static List<LatLng> _ringToLatLng(List ring) {
+    return ring.map((p) => LatLng((p[1] as num).toDouble(), (p[0] as num).toDouble())).toList();
   }
 }

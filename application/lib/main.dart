@@ -3,7 +3,8 @@ import 'pages/electric_page.dart';
 import 'pages/weather_page.dart';
 
 void main() {
-    const mapTilerKey = String.fromEnvironment('MAPTILER_KEY');
+    const mapTilerKey = "b2Qcb2a8OPn4k4DuPp3Y";
+    // String.fromEnvironment('MAPTILER_KEY');
 
     assert(
     mapTilerKey.isNotEmpty,

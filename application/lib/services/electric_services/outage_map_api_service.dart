@@ -3,17 +3,23 @@ import 'package:http/http.dart' as http;
 import '../../models/OutageItem.dart';
 
 class OutageMapResult {
+  final List<OutagePointGroup> wardSummaries;
+  final List<OutageAreaFeature> roadAreas;
+  final List<OutageAreaFeature> placeAreas;
   final List<OutagePointGroup> points;
-  final List<OutageRoadSegment> roads;
 
-  OutageMapResult({required this.points, required this.roads});
+  OutageMapResult({
+    required this.wardSummaries,
+    required this.roadAreas,
+    required this.placeAreas,
+    required this.points,
+  });
 }
 
 class OutageMapApiService {
   static const String baseUrl = 'http://10.0.2.2:3000/api/outages';
 
-  static Future<OutageMapResult> getOutagesByWard({String? date }) async {
-    date ??=  '2026-07-17';
+  static Future<OutageMapResult> getOutagesByWard({String? date}) async {
     final uri = Uri.parse('$baseUrl/by-ward').replace(
       queryParameters: date != null ? {'date': date} : null,
     );
@@ -25,12 +31,17 @@ class OutageMapApiService {
     }
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final pointsJson = data['points'] as List? ?? [];
-    final roadsJson = data['roads'] as List? ?? [];
+
+    List<T> parseList<T>(String key, T Function(Map<String, dynamic>) fromJson) {
+      final list = data[key] as List? ?? [];
+      return list.map((e) => fromJson(e as Map<String, dynamic>)).toList();
+    }
 
     return OutageMapResult(
-      points: pointsJson.map((p) => OutagePointGroup.fromJson(p as Map<String, dynamic>)).toList(),
-      roads: roadsJson.map((r) => OutageRoadSegment.fromJson(r as Map<String, dynamic>)).toList(),
+      wardSummaries: parseList('wardSummaries', OutagePointGroup.fromJson),
+      roadAreas: parseList('roadAreas', OutageAreaFeature.fromJson),
+      placeAreas: parseList('placeAreas', OutageAreaFeature.fromJson),
+      points: parseList('points', OutagePointGroup.fromJson),
     );
   }
 }

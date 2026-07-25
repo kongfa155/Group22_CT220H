@@ -1600,6 +1600,85 @@
     "geom": {
       "type": "MultiPolygon",
       "coordinates": []
+    },
+    {
+      "name": "Hồ Hoàn Kiếm",
+      "normalized_name": "ho hoan kiem",
+      "aliases": [],
+      "type": "Hồ",
+      "parent_adm": "Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "Cty TNHH KD TMDV Vinfast",
+      "normalized_name": "cty tnhh kd tmdv vinfast",
+      "aliases": ["Công ty TNHH KD TMDV Vinfast"],
+      "type": "Cơ sở/Khu chức năng",
+      "parent_adm": "Thốt Nốt, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "Ấp Thới Quan A",
+      "normalized_name": "ap thoi quan a",
+      "aliases": [],
+      "type": "Ấp",
+      "parent_adm": "Thới Lai, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "Khu vực Trường Trung, Ấp Trường Đông",
+      "normalized_name": "khu vuc truong trung ap truong dong",
+      "aliases": [],
+      "type": "Khu vực",
+      "parent_adm": "Phước Thới, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "KCN Trà Nóc 2",
+      "normalized_name": "kcn tra noc 2",
+      "aliases": ["Khu công nghiệp Trà Nóc 2"],
+      "type": "Cơ sở/Khu chức năng",
+      "parent_adm": "Phước Thới, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "Công ty CP Cara Group - Chung cư Công ty 8",
+      "normalized_name": "cong ty cp cara group chung cu cong ty 8",
+      "aliases": [],
+      "type": "Cơ sở/Khu chức năng",
+      "parent_adm": "Cái Răng, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "Ấp Trường Thọ A, Trường Thọ 1",
+      "normalized_name": "ap truong tho a truong tho 1",
+      "aliases": [],
+      "type": "Ấp",
+      "parent_adm": "Trường Long, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "Khu dân cư 586 (Vạn Phát)",
+      "normalized_name": "khu dan cu 586 van phat",
+      "aliases": ["KDC 586", "KDC Vạn Phát"],
+      "type": "Khu dân cư",
+      "parent_adm": "Hưng Phú, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "ấp Phụng Thạnh, ấp E1",
+      "normalized_name": "ap phung thanh ap e1",
+      "aliases": [],
+      "type": "Ấp",
+      "parent_adm": "Thạnh Quới, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
+    },
+    {
+      "name": "ấp B1",
+      "normalized_name": "ap b1",
+      "aliases": [],
+      "type": "Ấp",
+      "parent_adm": "Thạnh An, Cần Thơ",
+      "geom": { "type": "MultiPolygon", "coordinates": [] }
     }
-  }
 ]

@@ -4,6 +4,7 @@ const { extractDistrictHint } = require("../utils/extractDistrictHint");
 
 const WARD_LEVEL_TYPES = new Set(["Phường", "Xã", "Thị trấn"]);
 const DISTRICT_LEVEL_TYPE = "Quận/Huyện";
+const ROAD_BUFFER_METERS = 10;
 
 exports.getOutagesByWard = async (req, res) => {
     try {
@@ -23,16 +24,25 @@ exports.getOutagesByWard = async (req, res) => {
         );
 
         const [{ rows: roadRows }, { rows: placeRows }, { rows: boundaryRows }] = await Promise.all([
-            pool.query(`SELECT normalized_name, ST_AsGeoJSON(geom) AS geojson FROM road_segments`),
+            // Buffer sẵn 10m mỗi bên NGAY TRONG QUERY - tính 1 lần cho mỗi
+            // đường (không phải mỗi outage), đỡ tốn CPU lặp lại.
+            pool.query(
+                `SELECT normalized_name,
+                        ST_AsGeoJSON(ST_Buffer(geom::geography, $1)::geometry) AS buffered_geojson
+                 FROM road_segments`,
+                [ROAD_BUFFER_METERS]
+            ),
             pool.query(`SELECT normalized_name, ST_AsGeoJSON(geom) AS geojson FROM place_geometries`),
             pool.query(
-                `SELECT id, name, normalized_name, type, ST_AsGeoJSON(ST_Centroid(geom)) AS centroid_geojson FROM admin_boundaries`
+                `SELECT id, name, normalized_name, type,
+                        ST_AsGeoJSON(ST_Centroid(geom)) AS centroid_geojson
+                 FROM admin_boundaries`
             ),
         ]);
 
-const roadByNormName = new Map(
-    roadRows.map((r) => [normalizeRoadKey(r.normalized_name), JSON.parse(r.geojson)])
-);
+        const roadByNormName = new Map(
+            roadRows.map((r) => [normalizeRoadKey(r.normalized_name), JSON.parse(r.buffered_geojson)])
+        );
         const placeByNormName = new Map(placeRows.map((p) => [p.normalized_name, JSON.parse(p.geojson)]));
 
         const wardByNormName = new Map();
@@ -44,9 +54,10 @@ const roadByNormName = new Map(
             else if (b.type === DISTRICT_LEVEL_TYPE) districtByNormName.set(b.normalized_name, entry);
         }
 
-        const points = []; // {lat,lng,label,outages:[]}
-        const roads = []; // {geometry, color, label, outages:[]}
-        const pointGroups = new Map(); // gộp outage trùng vị trí (ward centroid hoặc place) vào 1 marker
+        const roadAreas = [];
+        const placeAreas = [];
+        const fallbackPoints = new Map(); // dùng khi zoom sâu nhưng không có road/place cụ thể
+        const wardSummaries = new Map(); // dùng khi zoom xa - marker gộp cả phường
 
         for (const row of outageRows) {
             const outagePayload = {
@@ -60,16 +71,40 @@ const roadByNormName = new Map(
                 endTime: row.end_time,
             };
 
-            // --- Ưu tiên 1: có road_name và đã có geometry đường ---
+            // --- Xác định phường/quận để GỘP VÀO wardSummaries -----------
+            // Luôn làm bước này cho MỌI outage, kể cả outage đã match được
+            // road/place cụ thể - vì marker tổng hợp cấp phường (lúc zoom xa)
+            // cần liệt kê TẤT CẢ outage trong phường đó, không chỉ phần
+            // "chưa xác định vị trí".
+            let boundary = row.ward_name ? wardByNormName.get(normalizeVnText(row.ward_name)) : null;
+            if (!boundary) {
+                const districtHint = extractDistrictHint(row.power_company);
+                if (districtHint) boundary = districtByNormName.get(normalizeVnText(districtHint));
+            }
+
+            if (boundary) {
+                const key = `ward:${boundary.id}`;
+                if (!wardSummaries.has(key)) {
+                    wardSummaries.set(key, {
+                        boundaryId: boundary.id,
+                        label: boundary.name,
+                        lat: boundary.lat,
+                        lng: boundary.lng,
+                        outages: [],
+                    });
+                }
+                wardSummaries.get(key).outages.push(outagePayload);
+            } else {
+                console.warn(`[outageMapController] Không xác định được ward cho: "${row.area_text}"`);
+            }
+
+            // --- Xác định hiển thị CHI TIẾT (dùng khi zoom sâu) ----------
             if (row.road_name) {
                 const geometry = roadByNormName.get(normalizeRoadKey(row.road_name));
                 if (geometry) {
                     const extraction = row.extraction_result || {};
-                    // Có mốc bắt đầu/kết thúc => chỉ 1 đoạn (một phần đường) => cam
-                    // Không có mốc nào => toàn bộ đường => vàng
                     const isPartial = !!(extraction.from_landmark || extraction.to_landmark);
-
-                    roads.push({
+                    roadAreas.push({
                         geometry,
                         color: isPartial ? "orange" : "yellow",
                         label: row.road_name,
@@ -79,60 +114,40 @@ const roadByNormName = new Map(
                 }
             }
 
-            // --- Ưu tiên 2: có subarea_name và đã có geometry điểm ---
             if (row.subarea_name) {
                 const geometry = placeByNormName.get(normalizeVnText(row.subarea_name));
-                if (geometry && geometry.type === "Point") {
-                    const key = `place:${normalizeVnText(row.subarea_name)}`;
-                    if (!pointGroups.has(key)) {
-                        pointGroups.set(key, {
-                            lat: geometry.coordinates[1],
-                            lng: geometry.coordinates[0],
-                            label: row.subarea_name,
-                            precision: "point",
-                            outages: [],
-                        });
-                    }
-                    pointGroups.get(key).outages.push(outagePayload);
+                if (geometry) {
+                    placeAreas.push({
+                        geometry,
+                        color: "yellow",
+                        label: row.subarea_name,
+                        outage: outagePayload,
+                    });
                     continue;
                 }
             }
 
-            // --- Ưu tiên 3: fallback centroid ward ---
-            let boundary = row.ward_name ? wardByNormName.get(normalizeVnText(row.ward_name)) : null;
-            let precision = boundary ? "ward" : null;
-
-            // --- Ưu tiên 4: fallback centroid quận/huyện qua power_company ---
-            if (!boundary) {
-                const districtHint = extractDistrictHint(row.power_company);
-                if (districtHint) {
-                    boundary = districtByNormName.get(normalizeVnText(districtHint));
-                    if (boundary) precision = "district";
+            // --- Không match road/place cụ thể -> fallback điểm centroid -
+            if (boundary) {
+                const key = `point:${boundary.id}`;
+                if (!fallbackPoints.has(key)) {
+                    fallbackPoints.set(key, {
+                        label: boundary.name,
+                        lat: boundary.lat,
+                        lng: boundary.lng,
+                        outages: [],
+                    });
                 }
+                fallbackPoints.get(key).outages.push(outagePayload);
             }
-
-            if (!boundary) {
-                console.warn(`[outageMapController] Không xác định được vị trí: "${row.area_text}"`);
-                continue;
-            }
-
-            const key = `ward:${boundary.id}`;
-            if (!pointGroups.has(key)) {
-                pointGroups.set(key, {
-                    lat: boundary.lat,
-                    lng: boundary.lng,
-                    label: boundary.name,
-                    precision,
-                    outages: [],
-                });
-            }
-            pointGroups.get(key).outages.push(outagePayload);
         }
 
         res.json({
             date,
-            points: [...pointGroups.values()],
-            roads,
+            wardSummaries: [...wardSummaries.values()], // dùng khi ZOOM XA
+            roadAreas, // dùng khi ZOOM SÂU
+            placeAreas, // dùng khi ZOOM SÂU
+            points: [...fallbackPoints.values()], // dùng khi ZOOM SÂU (fallback)
         });
     } catch (err) {
         console.error(err);

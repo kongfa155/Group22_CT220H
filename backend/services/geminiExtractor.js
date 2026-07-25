@@ -84,12 +84,18 @@ async function extractAreaInfo(areaText, { maxRetries = 5 } = {}) {
         ],
         generationConfig: {
             temperature: 0,
-            responseMimeType: "application/json"
+                responseMimeType: "application/json",
+                maxOutputTokens: 1024,
+                thinkingConfig: {
+                    thinkingBudget: 0 // Tắt thinking - tác vụ phân loại đơn giản không cần,
+                                      // và thinking tokens tính chung vào maxOutputTokens
+                                      // gây cắt cụt response thật (JSON) như đã gặp.
+                }
         }
     };
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        await throttle(); // luôn giãn cách trước mỗi lần gọi, kể cả lần đầu
+        await throttle();
 
         const response = await fetch(GEMINI_URL, {
             method: "POST",
@@ -102,41 +108,51 @@ async function extractAreaInfo(areaText, { maxRetries = 5 } = {}) {
 
         if (!response.ok) {
             const errText = await response.text();
-
-            // 429 (rate limit) hoặc 503 (quá tải tạm thời) đáng để thử lại
             if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
                 const suggestedDelay = parseRetryDelaySeconds(errText);
-                const delayMs = suggestedDelay
-                    ? Math.ceil(suggestedDelay * 1000) + 1000 // +1s đệm an toàn
-                    : attempt * 5000; // fallback nếu không đọc được retryDelay
-
-                console.warn(
-                    `[geminiExtractor] Lỗi ${response.status} (lần ${attempt}/${maxRetries}), đợi ${delayMs}ms rồi thử lại...`
-                );
+                const delayMs = suggestedDelay ? Math.ceil(suggestedDelay * 1000) + 1000 : attempt * 5000;
+                console.warn(`[geminiExtractor] Lỗi ${response.status} (lần ${attempt}/${maxRetries}), đợi ${delayMs}ms rồi thử lại...`);
                 await new Promise((resolve) => setTimeout(resolve, delayMs));
                 continue;
             }
-
             throw new Error(`Gemini API lỗi ${response.status}: ${errText}`);
         }
 
         const data = await response.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const candidate = data?.candidates?.[0];
+        const rawText = candidate?.content?.parts?.[0]?.text;
+
+        // finishReason "MAX_TOKENS" nghĩa là response bị cắt cụt vì hết
+        // token, dù status HTTP vẫn 200 OK - đây chính là nguyên nhân hay
+        // gặp nhất của lỗi "không parse được JSON" (JSON bị cụt giữa chừng).
+        if (candidate?.finishReason === "MAX_TOKENS") {
+            console.warn(`[geminiExtractor] Response bị cắt cụt (MAX_TOKENS) cho: "${areaText}" - thử lại`);
+            if (attempt < maxRetries) continue;
+        }
 
         if (!rawText) {
             throw new Error("Gemini không trả về nội dung hợp lệ");
         }
 
+        // Làm sạch trước khi parse - đề phòng Gemini lỡ kèm markdown fence
+        // (```json ... ```) dù đã yêu cầu responseMimeType: application/json.
+        const cleaned = rawText.trim().replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+
         try {
-            return JSON.parse(rawText);
+            return JSON.parse(cleaned);
         } catch (e) {
-            throw new Error(`Không parse được JSON từ Gemini: ${rawText}`);
+            // Log rõ độ dài + 100 ký tự cuối để biết chính xác JSON bị cụt
+            // ở đâu, thay vì chỉ báo chung chung như trước.
+            console.error(
+                `[geminiExtractor] Parse lỗi. Độ dài: ${cleaned.length}, 100 ký tự cuối: "...${cleaned.slice(-100)}"`
+            );
+            if (attempt < maxRetries) continue;
+            throw new Error(`Không parse được JSON từ Gemini: ${cleaned}`);
         }
     }
 
     throw new Error(`Vượt quá số lần thử lại (${maxRetries}) cho area_text: ${areaText}`);
 }
-
 // ============================================================
 // XỬ LÝ THEO LÔ (BATCH) - giải quyết quota thấp (free tier: 20
 // request/ngày). Thay vì 1 area_text = 1 request, gộp nhiều
@@ -173,7 +189,11 @@ async function extractAreaInfoBatch(areaTextArray, { maxRetries = 5 } = {}) {
         ],
         generationConfig: {
             temperature: 0,
-            responseMimeType: "application/json"
+                responseMimeType: "application/json",
+                maxOutputTokens: 4096,
+                thinkingConfig: {
+                    thinkingBudget: 0
+                }
         }
     };
 
@@ -191,32 +211,39 @@ async function extractAreaInfoBatch(areaTextArray, { maxRetries = 5 } = {}) {
 
         if (!response.ok) {
             const errText = await response.text();
-
             if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
                 const suggestedDelay = parseRetryDelaySeconds(errText);
                 const delayMs = suggestedDelay ? Math.ceil(suggestedDelay * 1000) + 1000 : attempt * 5000;
-                console.warn(
-                    `[geminiExtractor] Batch lỗi ${response.status} (lần ${attempt}/${maxRetries}), đợi ${delayMs}ms...`
-                );
+                console.warn(`[geminiExtractor] Batch lỗi ${response.status} (lần ${attempt}/${maxRetries}), đợi ${delayMs}ms...`);
                 await new Promise((resolve) => setTimeout(resolve, delayMs));
                 continue;
             }
-
             throw new Error(`Gemini API lỗi ${response.status}: ${errText}`);
         }
 
         const data = await response.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const candidate = data?.candidates?.[0];
+        const rawText = candidate?.content?.parts?.[0]?.text;
+
+        if (candidate?.finishReason === "MAX_TOKENS") {
+            console.warn(`[geminiExtractor] Batch response bị cắt cụt (MAX_TOKENS), batch size ${areaTextArray.length} - thử lại`);
+            if (attempt < maxRetries) continue;
+        }
 
         if (!rawText) {
             throw new Error("Gemini không trả về nội dung hợp lệ (batch)");
         }
 
+        const cleaned = rawText.trim().replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+
         let parsed;
         try {
-            parsed = JSON.parse(rawText);
+            parsed = JSON.parse(cleaned);
         } catch (e) {
-            throw new Error(`Không parse được JSON từ Gemini (batch): ${rawText}`);
+            console.error(
+                `[geminiExtractor] Batch parse lỗi. Độ dài: ${cleaned.length}, 100 ký tự cuối: "...${cleaned.slice(-100)}"`
+            );
+            throw new Error(`Không parse được JSON từ Gemini (batch): ${cleaned}`);
         }
 
         if (!Array.isArray(parsed) || parsed.length !== areaTextArray.length) {
@@ -232,5 +259,4 @@ async function extractAreaInfoBatch(areaTextArray, { maxRetries = 5 } = {}) {
 
     throw new Error(`Vượt quá số lần thử lại (${maxRetries}) cho batch ${areaTextArray.length} record`);
 }
-
 module.exports = { extractAreaInfo, extractAreaInfoBatch };

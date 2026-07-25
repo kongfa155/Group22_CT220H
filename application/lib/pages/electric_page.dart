@@ -7,32 +7,6 @@ import '../models/OutageItem.dart';
 import '../services/electric_services/boundary_api_service.dart';
 import '../services/electric_services/outage_map_api_service.dart';
 
-// Tính khoảng cách (mét) từ 1 điểm đến 1 đoạn thẳng a-b, dùng phép chiếu
-// phẳng đơn giản (đủ chính xác cho khoảng cách nhỏ trong phạm vi TP Cần Thơ,
-// không cần chính xác tuyệt đối như geodesic thật).
-double _pointToSegmentDistanceMeters(LatLng p, LatLng a, LatLng b) {
-  const metersPerDegreeLat = 111320.0;
-  final metersPerDegreeLng = 111320.0 * cos(a.latitude * pi / 180);
-
-  double toX(LatLng point) => (point.longitude - a.longitude) * metersPerDegreeLng;
-  double toY(LatLng point) => (point.latitude - a.latitude) * metersPerDegreeLat;
-
-  final px = toX(p), py = toY(p);
-  final bx = toX(b), by = toY(b);
-
-  final lengthSquared = bx * bx + by * by;
-  double t = lengthSquared == 0 ? 0 : (px * bx + py * by) / lengthSquared;
-  t = t.clamp(0.0, 1.0);
-
-  final projX = t * bx;
-  final projY = t * by;
-
-  final dx = px - projX;
-  final dy = py - projY;
-  return sqrt(dx * dx + dy * dy);
-}
-
-
 class ElectricPage extends StatefulWidget {
   const ElectricPage({super.key});
 
@@ -41,40 +15,33 @@ class ElectricPage extends StatefulWidget {
 }
 
 class _ElectricPageState extends State<ElectricPage> {
-  //Tọa độ gốc Cần Thơ
   static const LatLng canThoCenter = LatLng(10.0452, 105.7469);
-  // Giới hạn khung nhìn quanh khu vực Cần Thơ (không cho kéo/zoom ra quá xa)
-  // Bounding box tạm, có thể tinh chỉnh sau khi có GADM boundaries chính xác.
   static final LatLngBounds canThoBounds = LatLngBounds(
-      const LatLng(9.0, 100.4), //Góc chéo trên
-      const LatLng(10.25, 105.95) //Góc chéo dưới
+    const LatLng(9.0, 100.4),
+    const LatLng(10.25, 105.95),
   );
 
+  // Ngưỡng zoom chuyển từ "tổng hợp theo phường" sang "chi tiết" - chỉnh
+  // lại số này sau khi test thực tế xem mức nào thấy rõ đường/khu vực.
+  static const double detailZoomThreshold = 14.0;
+
   final MapController _mapController = MapController();
+  double _currentZoom = 12;
 
   List<BoundaryFeature> _boundaries = [];
-  List<OutagePointGroup> _outagePoints = [];
-  List<OutageRoadSegment> _outageRoads = [];
+  List<OutagePointGroup> _wardSummaries = [];
+  List<OutageAreaFeature> _roadAreas = [];
+  List<OutageAreaFeature> _placeAreas = [];
+  List<OutagePointGroup> _fallbackPoints = [];
   bool _loading = true;
   String? _error;
+
+  bool get _isDetailZoom => _currentZoom >= detailZoomThreshold;
 
   @override
   void initState() {
     super.initState();
     _loadData();
-  }
-  List<OutageRoadSegment> _findRoadsNearPoint(LatLng tapPoint, {double thresholdMeters = 25}) {
-    final matches = <OutageRoadSegment>[];
-    for (final road in _outageRoads) {
-      for (int i = 0; i < road.points.length - 1; i++) {
-        final dist = _pointToSegmentDistanceMeters(tapPoint, road.points[i], road.points[i + 1]);
-        if (dist <= thresholdMeters) {
-          matches.add(road);
-          break; // đã match đoạn này, không cần kiểm tra tiếp các đoạn còn lại của road
-        }
-      }
-    }
-    return matches;
   }
 
   Future<void> _loadData() async {
@@ -87,8 +54,10 @@ class _ElectricPageState extends State<ElectricPage> {
 
       setState(() {
         _boundaries = boundaries;
-        _outagePoints = outageResult.points;
-        _outageRoads = outageResult.roads;
+        _wardSummaries = outageResult.wardSummaries;
+        _roadAreas = outageResult.roadAreas;
+        _placeAreas = outageResult.placeAreas;
+        _fallbackPoints = outageResult.points;
         _loading = false;
       });
     } catch (err) {
@@ -99,9 +68,6 @@ class _ElectricPageState extends State<ElectricPage> {
     }
   }
 
-
-  // Sinh màu ổn định dựa theo tên phường/quận, để cùng 1 tên luôn ra cùng 1 màu
-  // qua các lần load lại (thay vì random mỗi lần build).
   Color _colorForName(String name) {
     final hash = name.codeUnits.fold<int>(0, (prev, c) => prev + c);
     final random = Random(hash);
@@ -113,65 +79,15 @@ class _ElectricPageState extends State<ElectricPage> {
     );
   }
 
-  void _showOutageDetails(OutagePointGroup group) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.5,
-          minChildSize: 0.3,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (context, scrollController) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          group.label,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      if (group.precision != 'point')
-                        const Tooltip(
-                          message: 'Vị trí gần đúng (trung tâm khu vực hành chính, chưa xác định chi tiết)',
-                          child: Icon(Icons.info_outline, size: 18, color: Colors.orange),
-                        ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: ListView.separated(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(12),
-                    itemCount: group.outages.length,
-                    separatorBuilder: (_, __) => const Divider(height: 24),
-                    itemBuilder: (context, index) {
-                      final outage = group.outages[index];
-                      return _OutageDetailTile(outage: outage);
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+  void _showOutageDetailsGroup(OutagePointGroup group) {
+    _showOutageListSheet(group.label, group.outages);
   }
 
-  void _showRoadDetails(List<OutageRoadSegment> roads) {
+  void _showOutageDetailsSingle(String label, OutageDetailItem outage) {
+    _showOutageListSheet(label, [outage]);
+  }
+
+  void _showOutageListSheet(String title, List<OutageDetailItem> outages) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -190,7 +106,7 @@ class _ElectricPageState extends State<ElectricPage> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    roads.first.label,
+                    '$title (${outages.length} lịch cúp điện)',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -199,9 +115,9 @@ class _ElectricPageState extends State<ElectricPage> {
                   child: ListView.separated(
                     controller: scrollController,
                     padding: const EdgeInsets.all(12),
-                    itemCount: roads.length,
+                    itemCount: outages.length,
                     separatorBuilder: (_, __) => const Divider(height: 24),
-                    itemBuilder: (context, index) => _OutageDetailTile(outage: roads[index].outage),
+                    itemBuilder: (context, index) => _OutageDetailTile(outage: outages[index]),
                   ),
                 ),
               ],
@@ -211,6 +127,32 @@ class _ElectricPageState extends State<ElectricPage> {
       },
     );
   }
+
+  bool _pointInPolygon(LatLng point, List<LatLng> polygon) {
+    bool inside = false;
+    for (int i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      final xi = polygon[i].longitude, yi = polygon[i].latitude;
+      final xj = polygon[j].longitude, yj = polygon[j].latitude;
+      final intersect = ((yi > point.latitude) != (yj > point.latitude)) &&
+          (point.longitude < (xj - xi) * (point.latitude - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  void _handleMapTap(LatLng point) {
+    if (!_isDetailZoom) return;
+
+    for (final area in [..._roadAreas, ..._placeAreas]) {
+      for (final ring in area.polygons) {
+        if (_pointInPolygon(point, ring)) {
+          _showOutageDetailsSingle(area.label, area.outage);
+          return;
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -224,60 +166,113 @@ class _ElectricPageState extends State<ElectricPage> {
               minZoom: 8,
               maxZoom: 18,
               cameraConstraint: CameraConstraint.contain(bounds: canThoBounds),
-              onTap: (tapPosition, point) {
-                final roads = _findRoadsNearPoint(point);
-                if (roads.isNotEmpty) {
-                  _showRoadDetails(roads);
+              onMapEvent: (event) {
+                final newZoom = event.camera.zoom;
+                if ((newZoom - _currentZoom).abs() > 0.05) {
+                  setState(() => _currentZoom = newZoom);
                 }
               },
+              onTap: (tapPosition, point) => _handleMapTap(point),
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+                urlTemplate: "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
               ),
-              PolygonLayer(
-                polygons: _boundaries.expand((feature) {
-                  final color = _colorForName(feature.name);
-                  return feature.polygons.map(
-                        (ring) => Polygon(
-                      points: ring,
-                      color: color.withOpacity(0.4),
-                      borderColor: color,
-                      borderStrokeWidth: 1.5,
-                      label: feature.name,
-                    ),
-                  );
-                }).toList(),
-              ),PolylineLayer(
-                polylines: _outageRoads.map((road) {
-                  return Polyline(
-                    points: road.points,
-                    color: road.color == 'yellow' ? Colors.amber : Colors.deepOrange,
-                    strokeWidth: 5,
-                  );
-                }).toList(),
-              ),
-              MarkerLayer(
-                markers: _outagePoints.map((group) {
-                  return Marker(
-                    point: LatLng(group.lat, group.lng),
-                    width: 40,
-                    height: 40,
-                    child: GestureDetector(
-                      onTap: () => _showOutageDetails(group),
-                      child: Icon(
-                        Icons.bolt,
-                        color: group.precision == 'point' ? Colors.red : Colors.orange,
-                        size: 32,
-                        shadows: const [
-                          Shadow(color: Colors.black45, blurRadius: 4),
-                        ],
+
+              // --- ZOOM XA: tô màu ranh giới phường ---
+              if (!_isDetailZoom)
+                PolygonLayer(
+                  polygons: _boundaries.expand((feature) {
+                    final color = _colorForName(feature.name);
+                    return feature.polygons.map(
+                          (ring) => Polygon(
+                        points: ring,
+                        color: color.withOpacity(0.4),
+                        borderColor: color,
+                        borderStrokeWidth: 1.5,
+                        label: _currentZoom >= 11 ? feature.name : null,
                       ),
-                    ),
-                  );
-                }).toList(),
-              ),
+                    );
+                  }).toList(),
+                ),
+
+              // --- ZOOM SÂU: tô vàng/cam đường + khu vực cụ thể ---
+              if (_isDetailZoom)
+                PolygonLayer(
+                  polygons: [..._roadAreas, ..._placeAreas].expand((area) {
+                    final fillColor = area.color == 'yellow' ? Colors.amber : Colors.deepOrange;
+                    return area.polygons.map(
+                          (ring) => Polygon(
+                        points: ring,
+                        color: fillColor.withOpacity(0.5),
+                        borderColor: fillColor,
+                        borderStrokeWidth: 1.5,
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+              // --- ZOOM XA: 1 marker gộp cho mỗi phường ---
+              if (!_isDetailZoom)
+                MarkerLayer(
+                  markers: _wardSummaries.map((group) {
+                    return Marker(
+                      point: LatLng(group.lat, group.lng),
+                      width: 44,
+                      height: 44,
+                      child: GestureDetector(
+                        onTap: () => _showOutageDetailsGroup(group),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Icon(
+                              Icons.bolt,
+                              color: Colors.red,
+                              size: 32,
+                              shadows: [Shadow(color: Colors.black45, blurRadius: 4)],
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '${group.outages.length}',
+                                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+              // --- ZOOM SÂU: marker fallback cho outage chưa match road/place ---
+              if (_isDetailZoom)
+                MarkerLayer(
+                  markers: _fallbackPoints.map((group) {
+                    return Marker(
+                      point: LatLng(group.lat, group.lng),
+                      width: 36,
+                      height: 36,
+                      child: GestureDetector(
+                        onTap: () => _showOutageDetailsGroup(group),
+                        child: const Icon(
+                          Icons.bolt,
+                          color: Colors.orange,
+                          size: 28,
+                          shadows: [Shadow(color: Colors.black45, blurRadius: 4)],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
             ],
           ),
           if (_loading) const Center(child: CircularProgressIndicator()),
@@ -291,7 +286,7 @@ class _ElectricPageState extends State<ElectricPage> {
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Text('Lỗi tải ranh giới: $_error'),
+                  child: Text('Lỗi tải dữ liệu: $_error'),
                 ),
               ),
             ),
@@ -300,8 +295,9 @@ class _ElectricPageState extends State<ElectricPage> {
     );
   }
 }
+
 class _OutageDetailTile extends StatelessWidget {
-  final OutageItem outage;
+  final OutageDetailItem outage;
 
   const _OutageDetailTile({required this.outage});
 
