@@ -99,20 +99,33 @@ exports.getOutagesByWard = async (req, res) => {
             }
 
             // --- Xác định hiển thị CHI TIẾT (dùng khi zoom sâu) ----------
-            if (row.road_name) {
-                const geometry = roadByNormName.get(normalizeRoadKey(row.road_name));
-                if (geometry) {
-                    const extraction = row.extraction_result || {};
-                    const isPartial = !!(extraction.from_landmark || extraction.to_landmark);
-                    roadAreas.push({
-                        geometry,
-                        color: isPartial ? "orange" : "yellow",
-                        label: row.road_name,
-                        outage: outagePayload,
-                    });
-                    continue;
-                }
-            }
+                        // Đọc TOÀN BỘ mảng streets[] trong extraction_result (JSONB đã
+                        // có sẵn), thay vì chỉ đọc road_name (chỉ lưu 1 đường đầu tiên).
+                        // Với outage nhiều đường (VD khu trung tâm cắt điện đồng loạt),
+                        // vòng lặp này giúp tô màu TẤT CẢ đường đã có trong road_segments,
+                        // không chỉ 1 đường đại diện.
+                        const extraction = row.extraction_result || {};
+                        const streetList = Array.isArray(extraction.streets) && extraction.streets.length > 0
+                            ? extraction.streets
+                            : (row.road_name ? [row.road_name] : []);
+
+                        let matchedAnyRoad = false;
+
+                        for (const streetName of streetList) {
+                            const geometry = roadByNormName.get(normalizeRoadKey(streetName));
+                            if (geometry) {
+                                const isPartial = !!(extraction.from_landmark || extraction.to_landmark);
+                                roadAreas.push({
+                                    geometry,
+                                    color: isPartial ? "orange" : "yellow",
+                                    label: streetName,
+                                    outage: outagePayload,
+                                });
+                                matchedAnyRoad = true;
+                            }
+                        }
+
+                        if (matchedAnyRoad) continue;
 
             if (row.subarea_name) {
                 const geometry = placeByNormName.get(normalizeVnText(row.subarea_name));
