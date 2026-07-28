@@ -117,6 +117,7 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+<<<<<<< HEAD
 
 
 # Thư mục chứa dependencies (Luôn luôn bỏ qua)
@@ -168,3 +169,5 @@ Thumbs.db
 *.njsproj
 *.sln
 
+=======
+>>>>>>> a8251f78921cef83c1cde3ff9599ca1e821611aa
