@@ -18,7 +18,7 @@ class _ElectricPageState extends State<ElectricPage> {
   static const LatLng canThoCenter = LatLng(10.0452, 105.7469);
   static final LatLngBounds canThoBounds = LatLngBounds(
     const LatLng(9.0, 100.4),
-    const LatLng(10.25, 105.95),
+    const LatLng(10.4, 105.95),
   );
 
   // Ngưỡng zoom chuyển từ "tổng hợp theo phường" sang "chi tiết" - chỉnh

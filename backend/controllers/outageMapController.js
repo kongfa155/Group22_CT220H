@@ -62,6 +62,16 @@ exports.getOutagesByWard = async (req, res) => {
             const wardKey = normalizeVnText(extractWardFromParentName(r.parent_name));
             const geometry = JSON.parse(r.buffered_geojson);
 
+             //Check nếu road chưa có tọa độ thì không gửi lên
+             if (
+                    !geometry ||
+                    !geometry.coordinates ||
+                    geometry.coordinates.length === 0
+                ) {
+                    console.warn("Road geometry rỗng:", r.normalized_name);
+                    continue;
+                }
+
             roadByCompositeKey.set(`${roadKey}|${wardKey}`, geometry);
 
             if (!roadByNameOnly.has(roadKey)) {

@@ -85,13 +85,19 @@ class OutageAreaFeature {
   factory OutageAreaFeature.fromJson(Map<String, dynamic> json) {
     final geometry = json['geometry'] as Map<String, dynamic>;
     final type = geometry['type'] as String;
-    final coords = geometry['coordinates'] as List;
+    final coords = geometry['coordinates'] as List? ?? [];
 
     List<List<LatLng>> polygons = [];
+
     if (type == 'Polygon') {
-      polygons = [_ringToLatLng(coords[0] as List)];
+      if (coords.isNotEmpty) {
+        polygons = [_ringToLatLng(coords.first as List)];
+      }
     } else if (type == 'MultiPolygon') {
-      polygons = (coords).map((p) => _ringToLatLng((p as List)[0] as List)).toList();
+      polygons = coords
+          .where((p) => (p as List).isNotEmpty)
+          .map((p) => _ringToLatLng((p as List).first as List))
+          .toList();
     }
 
     return OutageAreaFeature(
