@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>CONTINUITY</title></head>
+<body>
+<h2>Goal</h2>
+<p>Update <code>.gitignore</code> for a Flutter project and create a GitHub Actions CI/CD workflow that builds and publishes an APK to GitHub Releases.</p>
+<h2>Constraints / Assumptions</h2>
+<ul>
+  <li>Repo: <code>/Users/hqnghi/git/CT220H</code> — single Flutter app in <code>c11_fooderlich/</code> sub-directory</li>
+  <li>Flutter SDK target: 3.32.x stable</li>
+  <li>Uses <code>build_runner</code> + <code>json_serializable</code> (codegen step needed)</li>
+  <li>Signing secrets must be added by user in GitHub repo settings</li>
+</ul>
+<h2>Key Decisions</h2>
+<ul>
+  <li>Root <code>.gitignore</code> replaced with comprehensive Flutter-specific version</li>
+  <li>Workflow has 3 jobs: <em>analyze</em> → <em>build</em> → <em>release</em></li>
+  <li>Debug APK on PRs, signed release APK on push to main/tag</li>
+  <li>GitHub Release auto-created on <code>v*.*.*</code> semver tags</li>
+</ul>
+<h2>State</h2>
+<ul>
+  <li><strong>Done:</strong> .gitignore updated, .github/workflows/flutter_ci.yml created</li>
+  <li><strong>Now:</strong> —</li>
+  <li><strong>Next:</strong> User can follow <code>SECRETS_GUIDE.md</code> and then trigger the release by pushing a semver tag.</li>
+</ul>
+<h2>Open Questions</h2>
+<ul>
+  <li>Does the user already have a signing keystore / want to generate one? (UNCONFIRMED)</li>
+</ul>
+<h2>Working Set</h2>
+<ul>
+  <li><code>/Users/hqnghi/git/CT220H/.gitignore</code></li>
+  <li><code>/Users/hqnghi/git/CT220H/.github/workflows/flutter_ci.yml</code></li>
+  <li><code>/Users/hqnghi/git/CT220H/SECRETS_GUIDE.md</code></li>
+</ul>
+</body>
+</html>
