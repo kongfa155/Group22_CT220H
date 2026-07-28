@@ -1244,5 +1244,518 @@
           10.1033845
         ]
       ] }
+    },
+    {
+      "name": "Mậu Thân",
+      "normalized_name": "mau than",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Đại lộ Hòa Bình",
+      "normalized_name": "dai lo hoa binh",
+      "aliases": [
+        "Hòa Bình"
+      ],
+      "parent_name": "Tân An, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Trần Phú",
+      "normalized_name": "tran phu",
+      "aliases": [],
+      "parent_name": "Cái Khế, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Võ Văn Kiệt",
+      "normalized_name": "vo van kiet",
+      "aliases": [
+        "Đường Sân Bay"
+      ],
+      "parent_name": "Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Lê Hồng Phong",
+      "normalized_name": "le hong phong",
+      "aliases": [
+        "Quốc lộ 91"
+      ],
+      "parent_name": "Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Văn Linh",
+      "normalized_name": "nguyen van linh",
+      "aliases": [
+        "Quốc lộ 91B"
+      ],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Võ Nguyên Giáp",
+      "normalized_name": "vo nguyen giap",
+      "aliases": [
+        "Nam Sông Hậu"
+      ],
+      "parent_name": "Cái Răng, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Lý Tự Trọng",
+      "normalized_name": "ly tu trong",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Trần Hưng Đạo",
+      "normalized_name": "tran hung dao",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Quang Trung",
+      "normalized_name": "quang trung",
+      "aliases": [],
+      "parent_name": "Cái Răng, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Tầm Vu",
+      "normalized_name": "tam vu",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "3 Tháng 2",
+      "normalized_name": "3 thang 2",
+      "aliases": [
+        "Đường 3/2"
+      ],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Trãi",
+      "normalized_name": "nguyen trai",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Hai Bà Trưng",
+      "normalized_name": "hai ba trung",
+      "aliases": [
+        "Bến Ninh Kiều"
+      ],
+      "parent_name": "Tân An, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Trần Văn Hoài",
+      "normalized_name": "tran van hoai",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Văn Cừ",
+      "normalized_name": "nguyen van cu",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Đệ",
+      "normalized_name": "nguyen de",
+      "aliases": [],
+      "parent_name": "Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Phan Đăng Lưu",
+      "normalized_name": "phan dang luu",
+      "aliases": [],
+      "parent_name": "Thốt Nốt, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Lê Lợi",
+      "normalized_name": "le loi",
+      "aliases": [],
+      "parent_name": "Cái Khế, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Trần Việt Châu",
+      "normalized_name": "tran viet chau",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Lộ Bòng Bong",
+      "normalized_name": "lo bong bong",
+      "aliases": [],
+      "parent_name": "Phong Điền, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Văn Trỗi",
+      "normalized_name": "nguyen van troi",
+      "aliases": [],
+      "parent_name": "Ô Môn, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Tôn Thất Tùng",
+      "normalized_name": "ton that tung",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Phan Đình Phùng",
+      "normalized_name": "phan dinh phung",
+      "aliases": [],
+      "parent_name": "Tân An, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Trần Hoàng Na",
+      "normalized_name": "tran hoang na",
+      "aliases": [],
+      "parent_name": "Ninh Kiều, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Ngô Quyền",
+      "normalized_name": "ngo quyen",
+      "aliases": [],
+      "parent_name": "Tân An, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Kim Đồng",
+      "normalized_name": "kim dong",
+      "aliases": [],
+      "parent_name": "Ô Môn, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Trần Quang Diệu",
+      "normalized_name": "tran quang dieu",
+      "aliases": [],
+      "parent_name": "An Thới, Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.7540028,
+            10.0715858
+          ],
+          [
+            105.7532484,
+            10.0690577
+          ],
+          [
+            105.7515522,
+            10.0669566
+          ],
+          [
+            105.7492135,
+            10.0651171
+          ],
+          [
+            105.7464833,
+            10.0637082
+          ],
+          [
+            105.7444254,
+            10.0628354
+          ],
+          [
+            105.7453248,
+            10.0617356
+          ],
+          [
+            105.7457759,
+            10.0612838
+          ],
+          [
+            105.7468654,
+            10.0608125
+          ],
+          [
+            105.7482595,
+            10.0598269
+          ],
+          [
+            105.7508722,
+            10.0604554
+          ],
+          [
+            105.7521502,
+            10.0603554
+          ],
+          [
+            105.7536604,
+            10.0595269
+          ],
+          [
+            105.7561004,
+            10.057942
+          ],
+          [
+            105.7577585,
+            10.0592065
+          ],
+          [
+            105.7597606,
+            10.058919
+          ],
+          [
+            105.7577462,
+            10.0592005
+          ],
+          [
+            105.7560838,
+            10.0579494
+          ],
+          [
+            105.7549532,
+            10.0563503
+          ],
+          [
+            105.7549791,
+            10.0557806
+          ],
+          [
+            105.7544815,
+            10.055718
+          ],
+          [
+            105.7537509,
+            10.0553219
+          ],
+          [
+            105.7533908,
+            10.0540291
+          ],
+          [
+            105.753645,
+            10.0531324
+          ],
+          [
+            105.7531473,
+            10.0520054
+          ],
+          [
+            105.7540473,
+            10.0513277
+          ],
+          [
+            105.7540791,
+            10.0511818
+          ],
+          [
+            105.7538393,
+            10.0509152
+          ],
+          [
+            105.7532723,
+            10.0511883
+          ],
+          [
+            105.7529486,
+            10.0504712
+          ],
+          [
+            105.7527053,
+            10.0495658
+          ],
+          [
+            105.7525531,
+            10.0466838
+          ]
+        ]
+      }
+    },
+    {
+      "name": "đường trục chính KCN Trà Nóc 2",
+      "normalized_name": "duong truc chinh kcn tra noc 2",
+      "aliases": [],
+      "parent_name": "Phước Thới, Ô Môn, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Chánh Tâm",
+      "normalized_name": "nguyen chanh tam",
+      "aliases": [],
+      "parent_name": "Trà Nóc, Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "đường số 6",
+      "normalized_name": "duong so 6",
+      "aliases": [],
+      "parent_name": "KCN Trà Nóc 1, Trà Nóc, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "đường số 3",
+      "normalized_name": "duong so 3",
+      "aliases": [],
+      "parent_name": "KCN Trà Nóc 1, Trà Nóc, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Bút Bảng",
+      "normalized_name": "nguyen but bang",
+      "aliases": [],
+      "parent_name": "Trà Nóc, Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Lê Thị Tạo",
+      "normalized_name": "le thi tao",
+      "aliases": [],
+      "parent_name": "Trà Nóc, Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Huỳnh Phan Hộ",
+      "normalized_name": "huynh phan ho",
+      "aliases": [],
+      "parent_name": "Trà An, Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Nguyễn Thông",
+      "normalized_name": "nguyen thong",
+      "aliases": [],
+      "parent_name": "An Thới, Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    },
+    {
+      "name": "Đồng Văn Cống",
+      "normalized_name": "dong van cong",
+      "aliases": [],
+      "parent_name": "An Thới, Bình Thủy, Cần Thơ",
+      "geom": {
+        "type": "LineString",
+        "coordinates": []
+      }
     }
 ]

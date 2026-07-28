@@ -22,7 +22,7 @@ async function run() {
                 `
                 INSERT INTO road_segments(name, normalized_name, aliases, parent_name, geom)
                 VALUES ($1, $2, $3, $4, ST_SetSRID(ST_GeomFromGeoJSON($5), 4326))
-                ON CONFLICT (normalized_name) DO NOTHING
+                ON CONFLICT (normalized_name, parent_name) DO NOTHING
                 `,
                 [entry.name, entry.normalized_name, entry.aliases || [], entry.parent_name, JSON.stringify(entry.geom)]
             );

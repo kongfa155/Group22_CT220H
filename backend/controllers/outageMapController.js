@@ -6,6 +6,13 @@ const WARD_LEVEL_TYPES = new Set(["Phường", "Xã", "Thị trấn"]);
 const DISTRICT_LEVEL_TYPE = "Quận/Huyện";
 const ROAD_BUFFER_METERS = 10;
 
+// Trích ward ra khỏi parent_name dạng "Tân An, Cần Thơ" hoặc
+// "An Thới, Bình Thủy, Cần Thơ" -> lấy phần đầu tiên ("Tân An"/"An Thới").
+function extractWardFromParentName(parentName) {
+    if (!parentName) return null;
+    return parentName.split(",")[0].trim();
+}
+
 exports.getOutagesByWard = async (req, res) => {
     try {
         const date = req.query.date || new Date().toISOString().slice(0, 10);
@@ -25,9 +32,11 @@ exports.getOutagesByWard = async (req, res) => {
 
         const [{ rows: roadRows }, { rows: placeRows }, { rows: boundaryRows }] = await Promise.all([
             // Buffer sẵn 10m mỗi bên NGAY TRONG QUERY - tính 1 lần cho mỗi
-            // đường (không phải mỗi outage), đỡ tốn CPU lặp lại.
+            // đường (không phải mỗi outage), đỡ tốn CPU lặp lại. Lấy thêm
+            // parent_name để phân biệt các đường trùng tên khác phường
+            // (VD "30/4" ở Tân An khác "30/4" ở Ninh Kiều).
             pool.query(
-                `SELECT normalized_name,
+                `SELECT normalized_name, parent_name,
                         ST_AsGeoJSON(ST_Buffer(geom::geography, $1)::geometry) AS buffered_geojson
                  FROM road_segments`,
                 [ROAD_BUFFER_METERS]
@@ -40,9 +49,26 @@ exports.getOutagesByWard = async (req, res) => {
             ),
         ]);
 
-        const roadByNormName = new Map(
-            roadRows.map((r) => [normalizeRoadKey(r.normalized_name), JSON.parse(r.buffered_geojson)])
-        );
+        // roadByCompositeKey: key = "tênđường|phường" - match chính xác khi
+        // biết cả ward_name của outage lẫn parent_name của đường.
+        // roadByNameOnly: fallback khi không đủ thông tin ward để match
+        // composite (giữ lại bản ghi ĐẦU TIÊN gặp - không đại diện chính
+        // xác 100% khi có nhiều đoạn trùng tên khác phường).
+        const roadByCompositeKey = new Map();
+        const roadByNameOnly = new Map();
+
+        for (const r of roadRows) {
+            const roadKey = normalizeRoadKey(r.normalized_name);
+            const wardKey = normalizeVnText(extractWardFromParentName(r.parent_name));
+            const geometry = JSON.parse(r.buffered_geojson);
+
+            roadByCompositeKey.set(`${roadKey}|${wardKey}`, geometry);
+
+            if (!roadByNameOnly.has(roadKey)) {
+                roadByNameOnly.set(roadKey, geometry);
+            }
+        }
+
         const placeByNormName = new Map(placeRows.map((p) => [p.normalized_name, JSON.parse(p.geojson)]));
 
         const wardByNormName = new Map();
@@ -99,33 +125,48 @@ exports.getOutagesByWard = async (req, res) => {
             }
 
             // --- Xác định hiển thị CHI TIẾT (dùng khi zoom sâu) ----------
-                        // Đọc TOÀN BỘ mảng streets[] trong extraction_result (JSONB đã
-                        // có sẵn), thay vì chỉ đọc road_name (chỉ lưu 1 đường đầu tiên).
-                        // Với outage nhiều đường (VD khu trung tâm cắt điện đồng loạt),
-                        // vòng lặp này giúp tô màu TẤT CẢ đường đã có trong road_segments,
-                        // không chỉ 1 đường đại diện.
-                        const extraction = row.extraction_result || {};
-                        const streetList = Array.isArray(extraction.streets) && extraction.streets.length > 0
-                            ? extraction.streets
-                            : (row.road_name ? [row.road_name] : []);
+            // Đọc TOÀN BỘ mảng streets[] trong extraction_result (JSONB đã
+            // có sẵn), thay vì chỉ đọc road_name (chỉ lưu 1 đường đầu tiên).
+            // Với outage nhiều đường (VD khu trung tâm cắt điện đồng loạt),
+            // vòng lặp này giúp tô màu TẤT CẢ đường đã có trong road_segments,
+            // không chỉ 1 đường đại diện.
+            const extraction = row.extraction_result || {};
+            const streetList = Array.isArray(extraction.streets) && extraction.streets.length > 0
+                ? extraction.streets
+                : (row.road_name ? [row.road_name] : []);
 
-                        let matchedAnyRoad = false;
+            let matchedAnyRoad = false;
+            const wardKeyForOutage = normalizeVnText(row.ward_name);
 
-                        for (const streetName of streetList) {
-                            const geometry = roadByNormName.get(normalizeRoadKey(streetName));
-                            if (geometry) {
-                                const isPartial = !!(extraction.from_landmark || extraction.to_landmark);
-                                roadAreas.push({
-                                    geometry,
-                                    color: isPartial ? "orange" : "yellow",
-                                    label: streetName,
-                                    outage: outagePayload,
-                                });
-                                matchedAnyRoad = true;
-                            }
-                        }
+            for (const streetName of streetList) {
+                const roadKey = normalizeRoadKey(streetName);
 
-                        if (matchedAnyRoad) continue;
+                // Ưu tiên match chính xác theo cả tên đường + phường - tránh
+                // nhầm giữa các đường trùng tên khác phường (VD "30/4").
+                let geometry = row.ward_name
+                    ? roadByCompositeKey.get(`${roadKey}|${wardKeyForOutage}`)
+                    : null;
+
+                // Không có ward_name hoặc không match composite -> fallback
+                // theo tên thôi (có thể chọn nhầm đoạn nếu trùng tên khác
+                // phường, nhưng vẫn hiển thị được thay vì bỏ trắng).
+                if (!geometry) {
+                    geometry = roadByNameOnly.get(roadKey);
+                }
+
+                if (geometry) {
+                    const isPartial = !!(extraction.from_landmark || extraction.to_landmark);
+                    roadAreas.push({
+                        geometry,
+                        color: isPartial ? "orange" : "yellow",
+                        label: streetName,
+                        outage: outagePayload,
+                    });
+                    matchedAnyRoad = true;
+                }
+            }
+
+            if (matchedAnyRoad) continue;
 
             if (row.subarea_name) {
                 const geometry = placeByNormName.get(normalizeVnText(row.subarea_name));

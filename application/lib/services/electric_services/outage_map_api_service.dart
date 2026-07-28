@@ -17,7 +17,7 @@ class OutageMapResult {
 }
 
 class OutageMapApiService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api/outages';
+  static const String baseUrl = 'https://group22-ct220h.onrender.com/api/outages';
 
   static Future<OutageMapResult> getOutagesByWard({String? date}) async {
     final uri = Uri.parse('$baseUrl/by-ward').replace(
