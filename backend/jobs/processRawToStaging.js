@@ -144,25 +144,45 @@ async function processBatch(rows) {
 }
 
 async function run() {
-    const { rows: unprocessed } = await pool.query(
-        `
-        SELECT id, area_text FROM electric_outages_raw
-        WHERE processed = FALSE
-        ORDER BY scraped_at ASC
-        LIMIT $1
-        `,
-        [BATCH_SIZE]
-    );
+    let totalSuccess = 0;
+    let totalFailed = 0;
+    let round = 0;
+    const MAX_ROUNDS = 10;
 
-    console.log(`[processRawToStaging] Tìm thấy ${unprocessed.length} record chưa xử lý`);
+    while (round < MAX_ROUNDS) {
+        round++;
 
-    const result = await processBatch(unprocessed);
+        const { rows: unprocessed } = await pool.query(
+            `
+            SELECT id, area_text FROM electric_outages_raw
+            WHERE processed = FALSE
+            ORDER BY scraped_at ASC
+            LIMIT $1
+            `,
+            [BATCH_SIZE]
+        );
 
-    const estimatedRequests = Math.ceil(result.aiCalledCount / AI_BATCH_SIZE);
-    console.log(
-        `[processRawToStaging] Hoàn tất: ${result.success} thành công, ${result.failed} thất bại ` +
-        `(${result.cachedCount} dùng cache, ${result.aiCalledCount} gọi AI qua ~${estimatedRequests} request)`
-    );
+        if (unprocessed.length === 0) {
+            console.log(`[processRawToStaging] Không còn record nào chưa xử lý - dừng sau ${round - 1} vòng`);
+            break;
+        }
+
+        console.log(`[processRawToStaging] Vòng ${round}: tìm thấy ${unprocessed.length} record chưa xử lý`);
+
+        const result = await processBatch(unprocessed);
+        totalSuccess += result.success;
+        totalFailed += result.failed;
+
+        const estimatedRequests = Math.ceil(result.aiCalledCount / AI_BATCH_SIZE);
+        console.log(
+            `[processRawToStaging] Vòng ${round} hoàn tất: ${result.success} thành công, ${result.failed} thất bại ` +
+            `(${result.cachedCount} dùng cache, ${result.aiCalledCount} gọi AI qua ~${estimatedRequests} request)`
+        );
+
+        if (unprocessed.length < BATCH_SIZE) break;
+    }
+
+    console.log(`\n[processRawToStaging] TỔNG KẾT: ${totalSuccess} thành công, ${totalFailed} thất bại qua ${round} vòng`);
 }
 
 if (require.main === module) {
