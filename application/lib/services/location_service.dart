@@ -2,6 +2,7 @@ import 'package:geolocator/geolocator.dart';
 
 class LocationService {
   Future<Position> getCurrentLocation() async {
+    //Xóa tọa độ Ctho giả
     final locationServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!locationServiceEnabled) {
       throw Exception('Dịch vụ vị trí đang tắt. Vui lòng bật GPS.');

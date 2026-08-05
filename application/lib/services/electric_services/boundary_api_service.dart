@@ -3,10 +3,13 @@ import 'package:http/http.dart' as http;
 import '../../models/BoundaryFeature.dart';
 
 class BoundaryApiService {
-  static const String baseUrl = 'https://group22-ct220h.onrender.com/api/boundaries';
-
+  static const String baseUrl =
+      'https://group22-ct220h.onrender.com/api/boundaries';
+    
   static Future<List<BoundaryFeature>> getAllBoundaries() async {
-    final response = await http.get(Uri.parse(baseUrl));
+    final response = await http
+        .get(Uri.parse(baseUrl))
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to load boundaries');

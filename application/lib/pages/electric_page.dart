@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:intl/intl.dart';
 import 'dart:math';
 import '../models/BoundaryFeature.dart';
 import '../models/OutageItem.dart';
@@ -37,6 +38,9 @@ class _ElectricPageState extends State<ElectricPage> {
   List<OutageAreaFeature> _placeAreas = [];
   List<OutagePointGroup> _fallbackPoints = [];
   bool _loading = true;
+  bool _usingCachedData = false;
+  String _outageDate = '';
+  DateTime? _lastUpdated;
   String? _error;
 
   bool get _isDetailZoom => _currentZoom >= detailZoomThreshold;
@@ -46,14 +50,20 @@ class _ElectricPageState extends State<ElectricPage> {
     super.initState();
     _loadData();
   }
-
+    //Lấy dữ liệu hằng ngày, lưu vào cache để sau này xài khi không có điện
   Future<void> _loadData() async {
-    try {
-      final boundariesFuture = BoundaryApiService.getAllBoundaries();
-      final outageFuture = OutageMapApiService.getOutagesByWard();
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-      final boundaries = await boundariesFuture;
+    try {
+      final boundariesFuture = BoundaryApiService.getAllBoundaries().then(
+        (boundaries) => boundaries,
+        onError: (_) => <BoundaryFeature>[],
+      );
+      final outageFuture = OutageMapApiService.getOutagesByWard(date: today);
       final outageResult = await outageFuture;
+
+      // Ranh giới chỉ phục vụ bản đồ; danh sách/cache vẫn dùng được khi offline.
+      final boundaries = await boundariesFuture;
 
       setState(() {
         _boundaries = boundaries;
@@ -61,6 +71,9 @@ class _ElectricPageState extends State<ElectricPage> {
         _roadAreas = outageResult.roadAreas;
         _placeAreas = outageResult.placeAreas;
         _fallbackPoints = outageResult.points;
+        _outageDate = outageResult.date;
+        _lastUpdated = outageResult.lastUpdated;
+        _usingCachedData = outageResult.fromCache;
         _loading = false;
       });
     } catch (err) {
@@ -161,7 +174,7 @@ class _ElectricPageState extends State<ElectricPage> {
       }
     }
   }
-
+    //Nút trở về tọa độ hiện tại của người dùng
   Future<void> _moveToCurrentLocation() async {
     if (_locating) return;
 
@@ -187,136 +200,167 @@ class _ElectricPageState extends State<ElectricPage> {
     return Scaffold(
       body: Stack(
         children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: canThoCenter,
-              initialZoom: 12,
-              minZoom: 8,
-              maxZoom: 18,
-              cameraConstraint: CameraConstraint.contain(bounds: canThoBounds),
-              onMapEvent: (event) {
-                final newZoom = event.camera.zoom;
-                if ((newZoom - _currentZoom).abs() > 0.05) {
-                  setState(() => _currentZoom = newZoom);
-                }
-              },
-              onTap: (tapPosition, point) => _handleMapTap(point),
-            ),
-            children: [
-              TileLayer(
-                urlTemplate:
-                    "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+          if (!_usingCachedData)
+            FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: canThoCenter,
+                initialZoom: 12,
+                minZoom: 8,
+                maxZoom: 18,
+                cameraConstraint: CameraConstraint.contain(
+                  bounds: canThoBounds,
+                ),
+                onMapEvent: (event) {
+                  final newZoom = event.camera.zoom;
+                  if ((newZoom - _currentZoom).abs() > 0.05) {
+                    setState(() => _currentZoom = newZoom);
+                  }
+                },
+                onTap: (tapPosition, point) => _handleMapTap(point),
               ),
-
-              // --- ZOOM XA: tô màu ranh giới phường ---
-              if (!_isDetailZoom)
-                PolygonLayer(
-                  polygons: _boundaries.expand((feature) {
-                    final color = _colorForName(feature.name);
-                    return feature.polygons.map(
-                      (ring) => Polygon(
-                        points: ring,
-                        color: color.withOpacity(0.4),
-                        borderColor: color,
-                        borderStrokeWidth: 1.5,
-                        label: _currentZoom >= 11 ? feature.name : null,
-                      ),
-                    );
-                  }).toList(),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
                 ),
 
-              // --- ZOOM SÂU: tô vàng/cam đường + khu vực cụ thể ---
-              if (_isDetailZoom)
-                PolygonLayer(
-                  polygons: [..._roadAreas, ..._placeAreas].expand((area) {
-                    final fillColor = area.color == 'yellow'
-                        ? Colors.amber
-                        : Colors.deepOrange;
-                    return area.polygons.map(
-                      (ring) => Polygon(
-                        points: ring,
-                        color: fillColor.withOpacity(0.5),
-                        borderColor: fillColor,
-                        borderStrokeWidth: 1.5,
-                      ),
-                    );
-                  }).toList(),
-                ),
+                // --- ZOOM XA: tô màu ranh giới phường ---
+                if (!_isDetailZoom)
+                  PolygonLayer(
+                    polygons: _boundaries.expand((feature) {
+                      final color = _colorForName(feature.name);
+                      return feature.polygons.map(
+                        (ring) => Polygon(
+                          points: ring,
+                          color: color.withOpacity(0.4),
+                          borderColor: color,
+                          borderStrokeWidth: 1.5,
+                          label: _currentZoom >= 11 ? feature.name : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
 
-              // --- ZOOM XA: 1 marker gộp cho mỗi phường ---
-              if (!_isDetailZoom)
-                MarkerLayer(
-                  markers: _wardSummaries.map((group) {
-                    return Marker(
-                      point: LatLng(group.lat, group.lng),
-                      width: 44,
-                      height: 44,
-                      child: GestureDetector(
-                        onTap: () => _showOutageDetailsGroup(group),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            const Icon(
-                              Icons.bolt,
-                              color: Colors.red,
-                              size: 32,
-                              shadows: [
-                                Shadow(color: Colors.black45, blurRadius: 4),
-                              ],
-                            ),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                  vertical: 1,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  '${group.outages.length}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
+                // --- ZOOM SÂU: tô vàng/cam đường + khu vực cụ thể ---
+                if (_isDetailZoom)
+                  PolygonLayer(
+                    polygons: [..._roadAreas, ..._placeAreas].expand((area) {
+                      final fillColor = area.color == 'yellow'
+                          ? Colors.amber
+                          : Colors.deepOrange;
+                      return area.polygons.map(
+                        (ring) => Polygon(
+                          points: ring,
+                          color: fillColor.withOpacity(0.5),
+                          borderColor: fillColor,
+                          borderStrokeWidth: 1.5,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                // --- ZOOM XA: 1 marker gộp cho mỗi phường ---
+                if (!_isDetailZoom)
+                  MarkerLayer(
+                    markers: _wardSummaries.map((group) {
+                      return Marker(
+                        point: LatLng(group.lat, group.lng),
+                        width: 44,
+                        height: 44,
+                        child: GestureDetector(
+                          onTap: () => _showOutageDetailsGroup(group),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              const Icon(
+                                Icons.bolt,
+                                color: Colors.red,
+                                size: 32,
+                                shadows: [
+                                  Shadow(color: Colors.black45, blurRadius: 4),
+                                ],
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 5,
+                                    vertical: 1,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '${group.outages.length}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                ),
+                      );
+                    }).toList(),
+                  ),
 
-              // --- ZOOM SÂU: marker fallback cho outage chưa match road/place ---
-              if (_isDetailZoom)
-                MarkerLayer(
-                  markers: _fallbackPoints.map((group) {
-                    return Marker(
-                      point: LatLng(group.lat, group.lng),
-                      width: 36,
-                      height: 36,
-                      child: GestureDetector(
-                        onTap: () => _showOutageDetailsGroup(group),
-                        child: const Icon(
-                          Icons.bolt,
-                          color: Colors.orange,
-                          size: 28,
-                          shadows: [
-                            Shadow(color: Colors.black45, blurRadius: 4),
-                          ],
+                // --- ZOOM SÂU: marker fallback cho outage chưa match road/place ---
+                if (_isDetailZoom)
+                  MarkerLayer(
+                    markers: _fallbackPoints.map((group) {
+                      return Marker(
+                        point: LatLng(group.lat, group.lng),
+                        width: 36,
+                        height: 36,
+                        child: GestureDetector(
+                          onTap: () => _showOutageDetailsGroup(group),
+                          child: const Icon(
+                            Icons.bolt,
+                            color: Colors.orange,
+                            size: 28,
+                            shadows: [
+                              Shadow(color: Colors.black45, blurRadius: 4),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
+              ],
+            ),
+          if (_usingCachedData)
+            Positioned.fill(
+              child: ColoredBox(
+                color: Colors.grey.shade100,
+                child: const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.cloud_off, size: 48, color: Colors.grey),
+                      SizedBox(height: 8),
+                      Text('Đang hiển thị lịch đã lưu trên thiết bị'),
+                    ],
+                  ),
                 ),
-            ],
-          ),
+              ),
+            ),
+          if (!_loading && _error == null)
+            Positioned(
+              top: 8,
+              left: 8,
+              right: 8,
+              child: _DailyOutagePanel(
+                groups: _wardSummaries,
+                date: _outageDate,
+                lastUpdated: _lastUpdated,
+                fromCache: _usingCachedData,
+              ),
+            ),
           if (_loading) const Center(child: CircularProgressIndicator()),
           if (_error != null)
             Positioned(
@@ -332,21 +376,123 @@ class _ElectricPageState extends State<ElectricPage> {
                 ),
               ),
             ),
-          Positioned(
-            right: 16,
-            bottom: 16,
-            child: FloatingActionButton.small(
-              heroTag: 'current-location',
-              tooltip: 'Về vị trí hiện tại',
-              onPressed: _locating ? null : _moveToCurrentLocation,
-              child: _locating
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.my_location),
+          if (!_usingCachedData)
+            Positioned(
+              right: 16,
+              bottom: 16,
+              //Nút ấn về vị trí hiện tại
+              child: FloatingActionButton.small(
+                heroTag: 'current-location',
+                tooltip: 'Về vị trí hiện tại',
+                onPressed: _locating ? null : _moveToCurrentLocation,
+                child: _locating
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.my_location),
+              ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+
+//Bản lịch trình hằng ngày
+class _DailyOutagePanel extends StatelessWidget {
+  final List<OutagePointGroup> groups;
+  final String date;
+  final DateTime? lastUpdated;
+  final bool fromCache;
+
+  const _DailyOutagePanel({
+    required this.groups,
+    required this.date,
+    required this.lastUpdated,
+    required this.fromCache,
+  });
+
+  int get outageCount =>
+      groups.fold(0, (total, group) => total + group.outages.length);
+
+  String get displayDate {
+    final parsedDate = DateTime.tryParse(date);
+    return parsedDate == null
+        ? date
+        : DateFormat('dd/MM/yyyy').format(parsedDate);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final updateLabel = lastUpdated == null
+        ? null
+        : DateFormat('HH:mm dd/MM/yyyy').format(lastUpdated!.toLocal());
+
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      elevation: 3,
+      child: ExpansionTile(
+        leading: const Icon(Icons.electrical_services, color: Colors.orange),
+        title: Text(
+          'Lịch cúp điện hôm nay ($outageCount)',
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          fromCache
+              ? 'Ngoại tuyến • Dữ liệu ngày $displayDate'
+              : 'Dữ liệu ngày $displayDate',
+        ),
+        children: [
+          if (updateLabel != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Cập nhật lần cuối: $updateLabel',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            ),
+          const Divider(height: 1),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+            ),
+            child: groups.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Text('Không có lịch cúp điện trong ngày này.'),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.only(bottom: 8),
+                    itemCount: groups.length,
+                    itemBuilder: (context, index) {
+                      final group = groups[index];
+                      return ExpansionTile(
+                        title: Text(group.label),
+                        subtitle: Text('${group.outages.length} lịch cúp điện'),
+                        children: group.outages
+                            .map(
+                              (outage) => Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  4,
+                                  16,
+                                  16,
+                                ),
+                                child: _OutageDetailTile(outage: outage),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

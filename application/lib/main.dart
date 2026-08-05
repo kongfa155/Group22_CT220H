@@ -42,6 +42,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        //Tiêu đề chung cho cả bên điện và thời tiết (Tui xóa cái tiêu đề thời tiết cũ của ông r nha TDuy,đem nó ra đây)
       appBar: AppBar(
         title: Text(currentPage == 0 ? 'Lịch cúp điện' : 'Dự báo thời tiết'),
         centerTitle: true,
