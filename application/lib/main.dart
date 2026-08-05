@@ -3,18 +3,17 @@ import 'pages/electric_page.dart';
 import 'pages/weather_page.dart';
 
 void main() {
-    const mapTilerKey = "b2Qcb2a8OPn4k4DuPp3Y";
-    // String.fromEnvironment('MAPTILER_KEY');
+  const mapTilerKey = "b2Qcb2a8OPn4k4DuPp3Y";
+  // String.fromEnvironment('MAPTILER_KEY');
 
-    assert(
+  assert(
     mapTilerKey.isNotEmpty,
     'Thiếu MAPTILER_KEY. '
-        'Hãy chạy bằng --dart-define=MAPTILER_KEY=...',
-    );
+    'Hãy chạy bằng --dart-define=MAPTILER_KEY=...',
+  );
 
-    runApp(const MyApp());
-  }
-
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -38,29 +37,24 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int currentPage = 0;
 
-  final List<Widget> pages = const [
-      ElectricPage(),
-      WeatherPage(),
-  ];
+  final List<Widget> pages = const [ElectricPage(), WeatherPage()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Chỗ xem lịch cúp điện'),
-      //  centerTitle: true,
-      // ),
-
+      appBar: AppBar(
+        title: Text(currentPage == 0 ? 'Lịch cúp điện' : 'Dự báo thời tiết'),
+        centerTitle: true,
+      ),
       body: pages[currentPage],
 
       bottomNavigationBar: NavigationBar(
         destinations: const [
           NavigationDestination(
-              icon: Icon(Icons.electrical_services),
-              label: 'Điện'),
-          NavigationDestination(
-              icon: Icon(Icons.sunny),
-              label: 'Thời tiết')
+            icon: Icon(Icons.electrical_services),
+            label: 'Điện',
+          ),
+          NavigationDestination(icon: Icon(Icons.sunny), label: 'Thời tiết'),
         ],
         selectedIndex: currentPage,
         onDestinationSelected: (int index) {

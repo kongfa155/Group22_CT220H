@@ -6,6 +6,7 @@ import '../models/BoundaryFeature.dart';
 import '../models/OutageItem.dart';
 import '../services/electric_services/boundary_api_service.dart';
 import '../services/electric_services/outage_map_api_service.dart';
+import '../services/location_service.dart';
 
 class ElectricPage extends StatefulWidget {
   const ElectricPage({super.key});
@@ -26,7 +27,9 @@ class _ElectricPageState extends State<ElectricPage> {
   static const double detailZoomThreshold = 14.0;
 
   final MapController _mapController = MapController();
+  final LocationService _locationService = LocationService();
   double _currentZoom = 12;
+  bool _locating = false;
 
   List<BoundaryFeature> _boundaries = [];
   List<OutagePointGroup> _wardSummaries = [];
@@ -107,7 +110,10 @@ class _ElectricPageState extends State<ElectricPage> {
                   padding: const EdgeInsets.all(16),
                   child: Text(
                     '$title (${outages.length} lịch cúp điện)',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
@@ -117,7 +123,8 @@ class _ElectricPageState extends State<ElectricPage> {
                     padding: const EdgeInsets.all(12),
                     itemCount: outages.length,
                     separatorBuilder: (_, __) => const Divider(height: 24),
-                    itemBuilder: (context, index) => _OutageDetailTile(outage: outages[index]),
+                    itemBuilder: (context, index) =>
+                        _OutageDetailTile(outage: outages[index]),
                   ),
                 ),
               ],
@@ -133,8 +140,10 @@ class _ElectricPageState extends State<ElectricPage> {
     for (int i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
       final xi = polygon[i].longitude, yi = polygon[i].latitude;
       final xj = polygon[j].longitude, yj = polygon[j].latitude;
-      final intersect = ((yi > point.latitude) != (yj > point.latitude)) &&
-          (point.longitude < (xj - xi) * (point.latitude - yi) / (yj - yi) + xi);
+      final intersect =
+          ((yi > point.latitude) != (yj > point.latitude)) &&
+          (point.longitude <
+              (xj - xi) * (point.latitude - yi) / (yj - yi) + xi);
       if (intersect) inside = !inside;
     }
     return inside;
@@ -150,6 +159,26 @@ class _ElectricPageState extends State<ElectricPage> {
           return;
         }
       }
+    }
+  }
+
+  Future<void> _moveToCurrentLocation() async {
+    if (_locating) return;
+
+    setState(() => _locating = true);
+    try {
+      final position = await _locationService.getCurrentLocation();
+      if (!mounted) return;
+
+      _mapController.move(LatLng(position.latitude, position.longitude), 16);
+    } catch (error) {
+      if (!mounted) return;
+      final message = error.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) setState(() => _locating = false);
     }
   }
 
@@ -176,7 +205,8 @@ class _ElectricPageState extends State<ElectricPage> {
             ),
             children: [
               TileLayer(
-                urlTemplate: "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+                urlTemplate:
+                    "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
               ),
 
               // --- ZOOM XA: tô màu ranh giới phường ---
@@ -185,7 +215,7 @@ class _ElectricPageState extends State<ElectricPage> {
                   polygons: _boundaries.expand((feature) {
                     final color = _colorForName(feature.name);
                     return feature.polygons.map(
-                          (ring) => Polygon(
+                      (ring) => Polygon(
                         points: ring,
                         color: color.withOpacity(0.4),
                         borderColor: color,
@@ -200,9 +230,11 @@ class _ElectricPageState extends State<ElectricPage> {
               if (_isDetailZoom)
                 PolygonLayer(
                   polygons: [..._roadAreas, ..._placeAreas].expand((area) {
-                    final fillColor = area.color == 'yellow' ? Colors.amber : Colors.deepOrange;
+                    final fillColor = area.color == 'yellow'
+                        ? Colors.amber
+                        : Colors.deepOrange;
                     return area.polygons.map(
-                          (ring) => Polygon(
+                      (ring) => Polygon(
                         points: ring,
                         color: fillColor.withOpacity(0.5),
                         borderColor: fillColor,
@@ -229,20 +261,28 @@ class _ElectricPageState extends State<ElectricPage> {
                               Icons.bolt,
                               color: Colors.red,
                               size: 32,
-                              shadows: [Shadow(color: Colors.black45, blurRadius: 4)],
+                              shadows: [
+                                Shadow(color: Colors.black45, blurRadius: 4),
+                              ],
                             ),
                             Positioned(
                               top: 0,
                               right: 0,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 1,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.red,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
                                   '${group.outages.length}',
-                                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               ),
                             ),
@@ -267,7 +307,9 @@ class _ElectricPageState extends State<ElectricPage> {
                           Icons.bolt,
                           color: Colors.orange,
                           size: 28,
-                          shadows: [Shadow(color: Colors.black45, blurRadius: 4)],
+                          shadows: [
+                            Shadow(color: Colors.black45, blurRadius: 4),
+                          ],
                         ),
                       ),
                     );
@@ -290,6 +332,22 @@ class _ElectricPageState extends State<ElectricPage> {
                 ),
               ),
             ),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton.small(
+              heroTag: 'current-location',
+              tooltip: 'Về vị trí hiện tại',
+              onPressed: _locating ? null : _moveToCurrentLocation,
+              child: _locating
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.my_location),
+            ),
+          ),
         ],
       ),
     );

@@ -53,13 +53,7 @@ class _WeatherPageState extends State<WeatherPage> {
   List<Weather>? _forecast; //doi tuong luu danh sach cac du bao trong 5 ngay
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Dự báo thời tiết"),
-        centerTitle: true,
-      ),
-      body: MyPageWeatherForecast(), 
-      extendBody: true,);
+    return Scaffold(body: MyPageWeatherForecast(), extendBody: true);
   }
 
   Widget MyPageWeatherForecast() {
@@ -82,7 +76,7 @@ class _WeatherPageState extends State<WeatherPage> {
       child: Container(
         width: MediaQuery.sizeOf(context).width,
         height: MediaQuery.sizeOf(context).height,
-          decoration: BoxDecoration(
+        decoration: BoxDecoration(
           //   image: DecorationImage(
           //
           //     image: AssetImage(
@@ -90,21 +84,21 @@ class _WeatherPageState extends State<WeatherPage> {
           //     ),
           //     fit: BoxFit.cover,
           //   ),
-            color: Color(0xFFFFF6F6)
-          ),
+          color: Color(0xFFFFF6F6),
+        ),
         child: ListView(
           // padding: const EdgeInsets.only(top: 50, bottom: 30),
           padding: const EdgeInsets.only(bottom: 30),
-            children: [
-              WeatherCard(
-                weather: _weather!, //truyen tham so weather
-              ),
-              ForecastListCard(
-                forecast:
-                    _forecast!, //Them dau cham than de bao chac chan khong null
-              ),
-              WeatherMapCard(),
-            ],
+          children: [
+            WeatherCard(
+              weather: _weather!, //truyen tham so weather
+            ),
+            ForecastListCard(
+              forecast:
+                  _forecast!, //Them dau cham than de bao chac chan khong null
+            ),
+            WeatherMapCard(),
+          ],
         ),
       ),
     );
