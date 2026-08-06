@@ -227,47 +227,45 @@ class _ForecastChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (data.length < 2) return;
 
+    const topPadding = 30.0;
+    const bottomPadding = 30.0;
+    const sidePadding = 14.0;
+
     final values = data.map((item) => _valueOf(item, mode)).toList();
     final minValue = values.reduce(math.min);
     final maxValue = values.reduce(math.max);
     final range = (maxValue - minValue).abs() < 0.1 ? 1.0 : maxValue - minValue;
-    const topPadding = 30.0;
-    const bottomPadding = 30.0;
-    const horizontalPadding = 14.0;
+
     final chartHeight = size.height - topPadding - bottomPadding;
     final baseline = size.height - bottomPadding;
-    final stepX = (size.width - horizontalPadding * 2) / (data.length - 1);
+    final stepX = (size.width - sidePadding * 2) / (data.length - 1);
 
-    final points = <Offset>[];
-    for (var i = 0; i < data.length; i++) {
-      final x = horizontalPadding + stepX * i;
-      final normalized = (values[i] - minValue) / range;
-      final y = topPadding + chartHeight * (1 - normalized);
-      points.add(Offset(x, y));
-    }
+    final points = [
+      for (var i = 0; i < data.length; i++)
+        Offset(
+          sidePadding + stepX * i,
+          topPadding + chartHeight * (1 - (values[i] - minValue) / range),
+        ),
+    ];
 
     final color = _modeColor(mode);
-
-    final fillPath = Path()..moveTo(points.first.dx, baseline);
     final linePath = Path()..moveTo(points.first.dx, points.first.dy);
-    fillPath.lineTo(points.first.dx, points.first.dy);
 
     for (var i = 1; i < points.length; i++) {
       final prev = points[i - 1];
       final current = points[i];
-      final controlX = (prev.dx + current.dx) / 2;
-      linePath.cubicTo(controlX, prev.dy, controlX, current.dy, current.dx, current.dy);
-      fillPath.cubicTo(controlX, prev.dy, controlX, current.dy, current.dx, current.dy);
+      final midX = (prev.dx + current.dx) / 2;
+      linePath.cubicTo(midX, prev.dy, midX, current.dy, current.dx, current.dy);
     }
 
-    fillPath
+    final fillPath = Path.from(linePath)
       ..lineTo(points.last.dx, baseline)
+      ..lineTo(points.first.dx, baseline)
       ..close();
 
     canvas.drawPath(
       fillPath,
       Paint()
-        ..style = PaintingStyle.fill
         ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -291,28 +289,20 @@ class _ForecastChartPainter extends CustomPainter {
       ..strokeWidth = 2.2
       ..color = color;
 
-    final labelStyle = TextStyle(
-      color: Colors.grey.shade800,
-      fontSize: 11,
-      fontWeight: FontWeight.w700,
-    );
-    final timeStyle = TextStyle(
-      color: Colors.grey.shade600,
-      fontSize: 11,
-    );
-
-    for (var i = 0; i < data.length; i++) {
-      final point = points[i];
-
-      canvas.drawCircle(point, 3.4, dotFill);
-      canvas.drawCircle(point, 3.4, dotStroke);
+    for (var i = 0; i < points.length; i++) {
+      canvas.drawCircle(points[i], 3.4, dotFill);
+      canvas.drawCircle(points[i], 3.4, dotStroke);
 
       _paintCentered(
         canvas,
         _formatValue(values[i], mode),
-        labelStyle,
-        point.dx,
-        point.dy - 22,
+        TextStyle(
+          color: Colors.grey.shade800,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+        points[i].dx,
+        points[i].dy - 22,
         size.width,
       );
 
@@ -321,8 +311,8 @@ class _ForecastChartPainter extends CustomPainter {
         _paintCentered(
           canvas,
           DateFormat('HH:mm').format(date),
-          timeStyle,
-          point.dx,
+          TextStyle(color: Colors.grey.shade600, fontSize: 11),
+          points[i].dx,
           size.height - 20,
           size.width,
         );
@@ -419,46 +409,27 @@ String _weekdayLabel(DateTime date) {
   return DateFormat('EEEE', 'vi').format(date);
 }
 
-String _modeTitle(ForecastChartMode mode) {
-  switch (mode) {
-    case ForecastChartMode.temperature:
-      return 'Nhiệt độ';
-    case ForecastChartMode.rain:
-      return 'Lượng mưa';
-    case ForecastChartMode.wind:
-      return 'Gió';
-  }
-}
+String _modeTitle(ForecastChartMode mode) => switch (mode) {
+      ForecastChartMode.temperature => 'Nhiệt độ',
+      ForecastChartMode.rain => 'Lượng mưa',
+      ForecastChartMode.wind => 'Gió',
+    };
 
-double _valueOf(Weather weather, ForecastChartMode mode) {
-  switch (mode) {
-    case ForecastChartMode.temperature:
-      return weather.temperature?.celsius ?? 0;
-    case ForecastChartMode.rain:
-      return weather.rainLast3Hours ?? weather.rainLastHour ?? 0;
-    case ForecastChartMode.wind:
-      return weather.windSpeed ?? 0;
-  }
-}
+double _valueOf(Weather weather, ForecastChartMode mode) => switch (mode) {
+      ForecastChartMode.temperature => weather.temperature?.celsius ?? 0,
+      ForecastChartMode.rain =>
+        weather.rainLast3Hours ?? weather.rainLastHour ?? 0,
+      ForecastChartMode.wind => weather.windSpeed ?? 0,
+    };
 
-String _formatValue(double value, ForecastChartMode mode) {
-  switch (mode) {
-    case ForecastChartMode.temperature:
-      return '${value.round()}°';
-    case ForecastChartMode.rain:
-      return value == 0 ? '0' : value.toStringAsFixed(1);
-    case ForecastChartMode.wind:
-      return value.toStringAsFixed(1);
-  }
-}
+String _formatValue(double value, ForecastChartMode mode) => switch (mode) {
+      ForecastChartMode.temperature => '${value.round()}°',
+      ForecastChartMode.rain => value.toStringAsFixed(1),
+      ForecastChartMode.wind => value.toStringAsFixed(1),
+    };
 
-Color _modeColor(ForecastChartMode mode) {
-  switch (mode) {
-    case ForecastChartMode.temperature:
-      return const Color(0xFFFFA000);
-    case ForecastChartMode.rain:
-      return const Color(0xFF2196F3);
-    case ForecastChartMode.wind:
-      return const Color(0xFF26A69A);
-  }
-}
+Color _modeColor(ForecastChartMode mode) => switch (mode) {
+      ForecastChartMode.temperature => const Color(0xFFFFA000),
+      ForecastChartMode.rain => const Color(0xFF2196F3),
+      ForecastChartMode.wind => const Color(0xFF26A69A),
+    };

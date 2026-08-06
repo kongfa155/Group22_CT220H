@@ -18,115 +18,90 @@ class WeatherCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final minMaxTemp = _todayMinMaxTemp(weather, forecast);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Container(
-          margin: const EdgeInsets.only(right: 10, left: 10),
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(61, 69, 170, 0.94),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.grey,
-                blurRadius: 10.0,
-                blurStyle: BlurStyle.solid,
-              ),
-            ],
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(61, 69, 170, 0.94),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 10.0,
+            blurStyle: BlurStyle.solid,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Column(
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        DateFormat('EEEE, dd/MM', 'vi').format(weather.date!),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        '${weather.areaName}',
-                        style: const TextStyle(
-                          fontSize: 30,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'Cao ${minMaxTemp.max.round()}\u00B0  \u2022  Th\u1EA5p ${minMaxTemp.min.round()}\u00B0',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        '${weather.weatherDescription}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    DateFormat('EEEE, dd/MM', 'vi').format(weather.date!),
+                    style: _white(20),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Image.network(
-                        'https://openweathermap.org/img/wn/${weather.weatherIcon}@2x.png',
-                        width: 70,
-                      ),
-                      Text(
-                        '${weather.temperature?.celsius?.round()}\u00B0C',
-                        style: const TextStyle(
-                          fontSize: 40,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                  Text('${weather.areaName}', style: _white(30)),
+                  Text(
+                    'Cao ${minMaxTemp.max.round()}\u00B0  \u2022  '
+                    'Th\u1EA5p ${minMaxTemp.min.round()}\u00B0',
+                    style: _white(16),
                   ),
+                  Text('${weather.weatherDescription}', style: _white(20)),
                 ],
               ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Column(
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.water_drop, color: Colors.white),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${weather.humidity}%',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
+                  Image.network(
+                    'https://openweathermap.org/img/wn/'
+                    '${weather.weatherIcon}@2x.png',
+                    width: 70,
                   ),
-                  Row(
-                    children: [
-                      const Icon(Icons.wind_power_sharp, color: Colors.white),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${weather.windSpeed} m/s',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    '${weather.temperature?.celsius?.round()}\u00B0C',
+                    style: _white(40),
                   ),
                 ],
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _InfoChip(
+                icon: Icons.water_drop,
+                label: '${weather.humidity}%',
+              ),
+              _InfoChip(
+                icon: Icons.wind_power_sharp,
+                label: '${weather.windSpeed} m/s',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+TextStyle _white(double size) => TextStyle(fontSize: size, color: Colors.white);
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white),
+        const SizedBox(width: 6),
+        Text(label, style: _white(18)),
       ],
     );
   }
