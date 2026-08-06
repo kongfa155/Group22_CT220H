@@ -447,6 +447,21 @@ class _ProvinceBadge extends StatelessWidget {
   }
 }
 
+String _layerName(WeatherLayer layer) {
+  switch (layer) {
+    case WeatherLayer.temperature:
+      return 'nhiệt độ';
+    case WeatherLayer.rain:
+      return 'lượng mưa';
+    case WeatherLayer.clouds:
+      return 'lượng mây';
+    case WeatherLayer.pressure:
+      return 'áp suất';
+    case WeatherLayer.wind:
+      return 'hướng gió';
+  }
+}
+
 String _metricText(_ProvinceWeather weather, WeatherLayer layer) {
   switch (layer) {
     case WeatherLayer.temperature:
