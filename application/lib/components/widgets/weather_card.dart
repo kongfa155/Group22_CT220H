@@ -137,54 +137,35 @@ class WeatherCard extends StatelessWidget {
   List<Weather> forecast,
 ) {
   final now = weather.date ?? DateTime.now();
-  final todayOnly = DateTime(now.year, now.month, now.day);
+  final today = DateTime(now.year, now.month, now.day);
 
-  double? tempOf(Weather item) => item.temperature?.celsius;
-
-  var temps = forecast
-      .where((item) {
-        final date = item.date;
-        return date != null &&
-            DateTime(date.year, date.month, date.day) == todayOnly &&
-            tempOf(item) != null;
-      })
-      .map((item) => tempOf(item)!)
+  List<double> tempsWhere(bool Function(DateTime) test) => forecast
+      .where((item) => item.date != null && test(item.date!))
+      .map((item) => item.temperature?.celsius)
+      .whereType<double>()
       .toList();
 
-  // Late in the day the 3-hourly forecast has almost no slots left for today,
-  // which collapses min and max onto the current reading. Widen to a rolling
-  // 24h window so the range stays meaningful.
-  if (temps.length < 2) {
-    final horizon = now.add(const Duration(hours: 24));
-    temps = forecast
-        .where((item) {
-          final date = item.date;
-          return date != null &&
-              date.isAfter(now.subtract(const Duration(hours: 3))) &&
-              date.isBefore(horizon) &&
-              tempOf(item) != null;
-        })
-        .map((item) => tempOf(item)!)
-        .toList();
-  }
-
-  final currentTemp = tempOf(weather);
-  if (currentTemp != null) {
-    temps.add(currentTemp);
-  }
-
-  final apiMin = weather.tempMin?.celsius;
-  final apiMax = weather.tempMax?.celsius;
-  if (apiMin != null) temps.add(apiMin);
-  if (apiMax != null) temps.add(apiMax);
-
-  if (temps.isEmpty) {
-    final fallback = currentTemp ?? 0;
-    return (min: fallback, max: fallback);
-  }
-
-  return (
-    min: temps.reduce(math.min),
-    max: temps.reduce(math.max),
+  var temps = tempsWhere(
+    (date) => DateTime(date.year, date.month, date.day) == today,
   );
+
+  // Về cuối ngày gần như không còn mốc dự báo nào của hôm nay, khiến min/max
+  // sụp về đúng nhiệt độ hiện tại. Khi đó nới ra cửa sổ trượt 24 giờ.
+  if (temps.length < 2) {
+    temps = tempsWhere(
+      (date) =>
+          date.isAfter(now.subtract(const Duration(hours: 3))) &&
+          date.isBefore(now.add(const Duration(hours: 24))),
+    );
+  }
+
+  temps.addAll([
+    weather.temperature?.celsius,
+    weather.tempMin?.celsius,
+    weather.tempMax?.celsius,
+  ].whereType<double>());
+
+  if (temps.isEmpty) return (min: 0.0, max: 0.0);
+
+  return (min: temps.reduce(math.min), max: temps.reduce(math.max));
 }

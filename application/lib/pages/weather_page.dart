@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
 import 'package:application/services/location_service.dart';
 import 'package:geolocator/geolocator.dart';
-// import '../components/logicBackground.dart';
 import '../components/widgets/forecast_list_card.dart';
 import '../components/widgets/weather_card.dart';
 import '../components/widgets/weather_map_card.dart';
