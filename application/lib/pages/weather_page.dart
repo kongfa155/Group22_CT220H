@@ -92,6 +92,7 @@ class _WeatherPageState extends State<WeatherPage> {
           children: [
             WeatherCard(
               weather: _weather!, //truyen tham so weather
+              forecast: _forecast!,
             ),
             ForecastListCard(
               forecast:

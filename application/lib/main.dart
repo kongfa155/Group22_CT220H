@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'pages/electric_page.dart';
 import 'pages/weather_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   const mapTilerKey = "b2Qcb2a8OPn4k4DuPp3Y";
   // String.fromEnvironment('MAPTILER_KEY');
 
@@ -11,6 +14,8 @@ void main() {
     'Thiếu MAPTILER_KEY. '
     'Hãy chạy bằng --dart-define=MAPTILER_KEY=...',
   );
+
+  await initializeDateFormatting('vi');
 
   runApp(const MyApp());
 }

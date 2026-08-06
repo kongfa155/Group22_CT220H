@@ -1,101 +1,5 @@
-// import 'package:application/services/weather_map_service.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_map/flutter_map.dart';
-// import 'package:latlong2/latlong.dart';
-//
-// class MapScreen extends StatefulWidget {
-//   final String apiKey;
-//
-//   const MapScreen({
-//     super.key,
-//     required this.apiKey,
-//   });
-//
-//   @override
-//   State<MapScreen> createState() => _MapScreenState();
-// }
-//
-// class _MapScreenState extends State<MapScreen> {
-//   late WeatherMapService mapService;
-//
-//   WeatherLayer selectedLayer = WeatherLayer.rain;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     mapService = WeatherMapService(widget.apiKey);
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text("Weather Map"),
-//       ),
-//       body: Column(
-//         children: [
-//           const SizedBox(height: 10),
-//
-//           SizedBox(
-//             height: 45,
-//             child: ListView(
-//               scrollDirection: Axis.horizontal,
-//               padding: const EdgeInsets.symmetric(horizontal: 10),
-//               children: [
-//                 buildChip("Clouds", WeatherLayer.clouds),
-//                 buildChip("Rain", WeatherLayer.rain),
-//                 buildChip("Temp", WeatherLayer.temperature),
-//                 buildChip("Wind", WeatherLayer.wind),
-//                 buildChip("Pressure", WeatherLayer.pressure),
-//               ],
-//             ),
-//           ),
-//
-//           const SizedBox(height: 10),
-//
-//           Expanded(
-//             child: FlutterMap(
-//               options: const MapOptions(
-//                 initialCenter: LatLng(10.0452, 105.7469),
-//                 initialZoom: 8,
-//                 minZoom: 4,
-//                 maxZoom: 18,
-//
-//               ),
-//               children: [
-//                 TileLayer(
-//                   urlTemplate:
-//                   "https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=b2Qcb2a8OPn4k4DuPp3Y",
-//                 ),
-//
-//                 TileLayer(
-//                   urlTemplate: mapService.getTileUrl(selectedLayer),
-//
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget buildChip(String title, WeatherLayer layer) {
-//     return Padding(
-//       padding: const EdgeInsets.only(right: 8),
-//       child: ChoiceChip(
-//         label: Text(title),
-//         selected: selectedLayer == layer,
-//         onSelected: (_) {
-//           setState(() {
-//             selectedLayer = layer;
-//           });
-//         },
-//       ),
-//     );
-//   }
-// }
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:application/services/weather_map_service.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +25,6 @@ class _MapScreenState extends State<MapScreen> {
 
   WeatherLayer selectedLayer = WeatherLayer.temperature;
 
-  // Ba điểm đại diện cho ba miền.
   final List<Map<String, dynamic>> provinces = const [
     {'name': 'Hà Nội', 'point': LatLng(21.0285, 105.8542)},
     {'name': 'Cao Bằng', 'point': LatLng(22.6666, 106.2588)},
@@ -159,7 +62,12 @@ class _MapScreenState extends State<MapScreen> {
     {'name': 'An Giang', 'point': LatLng(10.0125, 105.0809)},
   ];
 
-  final Map<String, double> temperatures = {};
+  final Map<String, _ProvinceWeather> provinceWeather = {};
+
+  static const double _markerMinZoom = 6.5;
+  double currentZoom = 5.3;
+
+  bool get showMarkers => currentZoom >= _markerMinZoom;
 
   @override
   void initState() {
@@ -168,45 +76,7 @@ class _MapScreenState extends State<MapScreen> {
     mapService = WeatherMapService(widget.apiKey);
     loadProvinceTemperatures();
   }
-  //
-  // Future<void> loadProvinceTemperatures() async {
-  //   await Future.wait(
-  //     provinces.map((province) async {
-  //       final name = province['name'] as String;
-  //       final point = province['point'] as LatLng;
-  //
-  //       final url = Uri.parse(
-  //         'https://api.openweathermap.org/data/2.5/weather'
-  //             '?lat=${point.latitude}'
-  //             '&lon=${point.longitude}'
-  //             '&units=metric'
-  //             '&appid=${widget.apiKey}',
-  //       );
-  //
-  //       try {
-  //         final response = await http.get(url);
-  //
-  //         if (response.statusCode == 200) {
-  //           final data =
-  //           jsonDecode(response.body) as Map<String, dynamic>;
-  //
-  //           temperatures[name] =
-  //               (data['main']['temp'] as num).toDouble();
-  //         } else {
-  //           debugPrint(
-  //             'Không lấy được $name: ${response.statusCode}',
-  //           );
-  //         }
-  //       } catch (error) {
-  //         debugPrint('Lỗi lấy nhiệt độ $name: $error');
-  //       }
-  //     }),
-  //   );
-  //
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
+
   Future<void> loadProvinceTemperatures() async {
     for (final province in provinces) {
       final name = province['name'] as String;
@@ -226,23 +96,30 @@ class _MapScreenState extends State<MapScreen> {
       try {
         final response = await http.get(url);
 
-        debugPrint(
-          '$name: ${response.statusCode} - ${response.body}',
+        if (response.statusCode != 200) {
+          debugPrint('Không lấy được $name: ${response.statusCode}');
+          continue;
+        }
+
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final temp = (data['main']?['temp'] as num?)?.toDouble();
+        if (temp == null) continue;
+
+        final entry = _ProvinceWeather(
+          temperature: temp,
+          windSpeed: (data['wind']?['speed'] as num?)?.toDouble() ?? 0,
+          windDegree: (data['wind']?['deg'] as num?)?.toDouble() ?? 0,
+          rain: (data['rain']?['1h'] as num?)?.toDouble() ??
+              (data['rain']?['3h'] as num?)?.toDouble() ??
+              0,
+          clouds: (data['clouds']?['all'] as num?)?.toDouble() ?? 0,
+          pressure: (data['main']?['pressure'] as num?)?.toDouble() ?? 0,
         );
 
-        if (response.statusCode == 200) {
-          final data =
-          jsonDecode(response.body) as Map<String, dynamic>;
-
-          final temp =
-          (data['main']?['temp'] as num?)?.toDouble();
-
-          if (temp != null && mounted) {
-            setState(() {
-              temperatures[name] = temp;
-            });
-          }
-        }
+        if (!mounted) return;
+        setState(() {
+          provinceWeather[name] = entry;
+        });
       } catch (error) {
         debugPrint('Lỗi $name: $error');
       }
@@ -257,7 +134,6 @@ class _MapScreenState extends State<MapScreen> {
 
     mapController.move(camera.center, newZoom);
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -299,11 +175,19 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 FlutterMap(
                   mapController: mapController,
-                  options: const MapOptions(
-                    initialCenter: LatLng(16.2, 106.2),
-                    initialZoom: 5.3,
+                  options: MapOptions(
+                    initialCenter: const LatLng(16.2, 106.2),
+                    initialZoom: currentZoom,
                     minZoom: 4,
                     maxZoom: 18,
+                    onPositionChanged: (camera, _) {
+                      // Chỉ setState khi vượt ngưỡng để tránh rebuild mỗi frame khi kéo zoom.
+                      if ((camera.zoom >= _markerMinZoom) != showMarkers) {
+                        setState(() => currentZoom = camera.zoom);
+                      } else {
+                        currentZoom = camera.zoom;
+                      }
+                    },
                   ),
                   children: [
                     TileLayer(
@@ -317,61 +201,53 @@ class _MapScreenState extends State<MapScreen> {
                       mapService.getTileUrl(selectedLayer),
                     ),
 
+                    if (showMarkers)
+                      MarkerLayer(
+                        markers: provinces.map((province) {
+                          final name = province['name'] as String;
+                          final point = province['point'] as LatLng;
+                          final data = provinceWeather[name];
 
-                    MarkerLayer(
-                      markers: provinces.map((province) {
-                        final name = province['name'] as String;
-                        final point = province['point'] as LatLng;
-                        final temperature = temperatures[name];
-
-                        return Marker(
-                          point: point,
-                          width: 85,
-                          height: 40,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Text(
-                              //   name,
-                              //   maxLines: 1,
-                              //   overflow: TextOverflow.ellipsis,
-                              //   textAlign: TextAlign.center,
-                              //   style: const TextStyle(
-                              //     color: Colors.white,
-                              //     fontSize: 11,
-                              //     fontWeight: FontWeight.bold,
-                              //     shadows: [
-                              //       Shadow(
-                              //         color: Colors.black,
-                              //         blurRadius: 3,
-                              //       ),
-                              //     ],
-                              //   ),
-                              // ),
-                              SizedBox(height: 14,),
-                              Text(
-                                temperature == null
-                                    ? '...'
-                                    : '${temperature.round()}°C',
-                                style: const TextStyle(
-                                  color: Colors.yellow,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black,
-                                      blurRadius: 3,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                          return Marker(
+                            point: point,
+                            width: 116,
+                            height: 52,
+                            child: _ProvinceBadge(
+                              name: name,
+                              data: data,
+                              layer: selectedLayer,
+                            ),
+                          );
+                        }).toList(),
+                      ),
                   ],
                 ),
+
+                if (!showMarkers)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 12,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'Phóng to để xem ${_layerName(selectedLayer)} từng tỉnh',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
 
                 // Nút phóng to và thu nhỏ.
                 Positioned(
@@ -453,5 +329,152 @@ class _MapScreenState extends State<MapScreen> {
         onPressed: onPressed,
       ),
     );
+  }
+}
+
+class _ProvinceWeather {
+  final double temperature;
+  final double windSpeed;
+  final double windDegree;
+  final double rain;
+  final double clouds;
+  final double pressure;
+
+  const _ProvinceWeather({
+    required this.temperature,
+    required this.windSpeed,
+    required this.windDegree,
+    required this.rain,
+    required this.clouds,
+    required this.pressure,
+  });
+}
+
+class _ProvinceBadge extends StatelessWidget {
+  final String name;
+  final _ProvinceWeather? data;
+  final WeatherLayer layer;
+
+  const _ProvinceBadge({
+    required this.name,
+    required this.data,
+    required this.layer,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final weather = data;
+    final isWind = layer == WeatherLayer.wind;
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.62),
+          borderRadius: BorderRadius.circular(9),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 9.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            if (weather == null)
+              const Text(
+                '...',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
+              )
+            else if (isWind)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 18,
+                    height: 18,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0288D1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Transform.rotate(
+                      // wind.deg là hướng gió thổi TỪ, +180 để mũi tên chỉ theo
+                      // chiều gió đang đi. Icon gốc hướng lên = 0° = Bắc.
+                      angle: (weather.windDegree + 180) * math.pi / 180,
+                      child: const Icon(
+                        Icons.navigation,
+                        size: 12,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${weather.windSpeed.toStringAsFixed(1)} m/s',
+                    style: const TextStyle(
+                      color: Color(0xFF81D4FA),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              )
+            else
+              Text(
+                _metricText(weather, layer),
+                style: TextStyle(
+                  color: _metricColor(layer),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String _metricText(_ProvinceWeather weather, WeatherLayer layer) {
+  switch (layer) {
+    case WeatherLayer.temperature:
+      return '${weather.temperature.round()}°C';
+    case WeatherLayer.rain:
+      return weather.rain == 0
+          ? '0 mm'
+          : '${weather.rain.toStringAsFixed(1)} mm';
+    case WeatherLayer.clouds:
+      return '${weather.clouds.round()}%';
+    case WeatherLayer.pressure:
+      return '${weather.pressure.round()} hPa';
+    case WeatherLayer.wind:
+      return '${weather.windSpeed.toStringAsFixed(1)} m/s';
+  }
+}
+
+Color _metricColor(WeatherLayer layer) {
+  switch (layer) {
+    case WeatherLayer.temperature:
+      return const Color(0xFFFFEB3B);
+    case WeatherLayer.rain:
+      return const Color(0xFF4FC3F7);
+    case WeatherLayer.clouds:
+      return const Color(0xFFE0E0E0);
+    case WeatherLayer.pressure:
+      return const Color(0xFFCE93D8);
+    case WeatherLayer.wind:
+      return const Color(0xFF81D4FA);
   }
 }
