@@ -1,5 +1,344 @@
 [
   {
+    "name": "Công ty CP Cảng Cần Thơ",
+    "normalized_name": "cong ty cp cang can tho",
+    "aliases": [],
+    "type": "Cơ sở/Khu chức năng",
+    "parent_adm": "Công ty CP Năng Lượng Tái Tạo CMC, Hưng Phú, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": []
+    }
+  },
+  {
+    "name": "KV 1",
+    "normalized_name": "kv 1",
+    "aliases": [
+      "Khu vực 1"
+    ],
+    "type": "Khu vực",
+    "parent_adm": "KV 10, Cái Răng, Hưng Phú, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": []
+    }
+  },
+  {
+    "name": "CS Nguyễn Thị Diễm",
+    "normalized_name": "cs nguyen thi diem",
+    "aliases": [
+      "Cơ sở Nguyễn Thị Diễm"
+    ],
+    "type": "Cơ sở/Khu chức năng",
+    "parent_adm": "Thốt Nốt, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": []
+    }
+  },
+  {
+    "name": "Khu vực Vĩnh Hòa",
+    "normalized_name": "khu vuc vinh hoa",
+    "aliases": [],
+    "type": "Khu vực",
+    "parent_adm": "Ngã Năm, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            105.5952671,
+            9.5675817
+          ],
+          [
+            105.5968981,
+            9.5682377
+          ],
+          [
+            105.5983144,
+            9.5682377
+          ],
+          [
+            105.5998702,
+            9.567095
+          ],
+          [
+            105.6002672,
+            9.5659206
+          ],
+          [
+            105.5989367,
+            9.564672
+          ],
+          [
+            105.5983681,
+            9.5649895
+          ],
+          [
+            105.5978423,
+            9.565
+          ],
+          [
+            105.5972843,
+            9.564598
+          ],
+          [
+            105.5955354,
+            9.5648202
+          ],
+          [
+            105.5947199,
+            9.5660898
+          ],
+          [
+            105.5952671,
+            9.5675817
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "Ấp Long Hòa",
+    "normalized_name": "ap long hoa",
+    "aliases": [],
+    "type": "Ấp",
+    "parent_adm": "Tân Long, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            105.6244363,
+            9.5410124
+          ],
+          [
+            105.6408726,
+            9.5520706
+          ],
+          [
+            105.6534685,
+            9.5641887
+          ],
+          [
+            105.6980153,
+            9.5510102
+          ],
+          [
+            105.729198,
+            9.5341955
+          ],
+          [
+            105.7356496,
+            9.5135926
+          ],
+          [
+            105.7024699,
+            9.4913218
+          ],
+          [
+            105.6817327,
+            9.4893522
+          ],
+          [
+            105.6444056,
+            9.4935944
+          ],
+          [
+            105.6259724,
+            9.5099566
+          ],
+          [
+            105.6189064,
+            9.52753
+          ],
+          [
+            105.6244363,
+            9.5410124
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "Long Thạnh 2",
+    "normalized_name": "long thanh 2",
+    "aliases": [],
+    "type": "Khu vực",
+    "parent_adm": "Thốt Nốt, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            105.5307162,
+            10.2712516
+          ],
+          [
+            105.5311304,
+            10.2719557
+          ],
+          [
+            105.5318582,
+            10.2720606
+          ],
+          [
+            105.5326896,
+            10.2715123
+          ],
+          [
+            105.53272,
+            10.2707392
+          ],
+          [
+            105.5320379,
+            10.2703286
+          ],
+          [
+            105.5309538,
+            10.2703316
+          ],
+          [
+            105.5306127,
+            10.2709639
+          ],
+          [
+            105.5307162,
+            10.2712516
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "Khánh Bình",
+    "normalized_name": "khanh binh",
+    "aliases": [],
+    "type": "Khu vực",
+    "parent_adm": "Hưng Phú, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            105.7816959,
+            9.9705117
+          ],
+          [
+            105.784582,
+            9.9709613
+          ],
+          [
+            105.786169,
+            9.9680921
+          ],
+          [
+            105.7827422,
+            9.9674241
+          ],
+          [
+            105.7816959,
+            9.9705117
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "Thạnh Hòa",
+    "normalized_name": "thanh hoa",
+    "aliases": [],
+    "type": "Khu vực",
+    "parent_adm": "Hưng Phú, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            105.7990059,
+            10.0078808
+          ],
+          [
+            105.7994543,
+            10.0083502
+          ],
+          [
+            105.8003337,
+            10.0085752
+          ],
+          [
+            105.8013295,
+            10.0079742
+          ],
+          [
+            105.8012002,
+            10.007469
+          ],
+          [
+            105.8008467,
+            10.006985
+          ],
+          [
+            105.7998595,
+            10.0068152
+          ],
+          [
+            105.7990663,
+            10.0069977
+          ],
+          [
+            105.7990706,
+            10.0074859
+          ],
+          [
+            105.7990059,
+            10.0078808
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "KV Tân Phước",
+    "normalized_name": "kv tan phuoc",
+    "aliases": [
+      "Khu vực Tân Phước"
+    ],
+    "type": "Khu vực",
+    "parent_adm": "Thới Long, Cần Thơ",
+    "geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            105.5589803,
+            10.1908999
+          ],
+          [
+            105.5621349,
+            10.1926001
+          ],
+          [
+            105.5649246,
+            10.1908787
+          ],
+          [
+            105.5610619,
+            10.1880696
+          ],
+          [
+            105.5590339,
+            10.1891468
+          ],
+          [
+            105.5589803,
+            10.1908999
+          ]
+        ]
+      ]
+    }
+  },
+  {
     "name": "Ấp Thới Quan A",
     "normalized_name": "ap thoi quan a",
     "aliases": [],
@@ -42,7 +381,50 @@
     "parent_adm": "Ngã Năm, Cần Thơ",
     "geom": {
       "type": "MultiPolygon",
-      "coordinates": []
+      "coordinates": [
+        [
+          [
+            105.5968943,
+            9.5638559
+          ],
+          [
+            105.597304,
+            9.5642445
+          ],
+          [
+            105.5978256,
+            9.5647843
+          ],
+          [
+            105.5995792,
+            9.5636036
+          ],
+          [
+            105.5984579,
+            9.5617999
+          ],
+          [
+            105.5977275,
+            9.562163
+          ],
+          [
+            105.5973728,
+            9.5623823
+          ],
+          [
+            105.5970798,
+            9.5627268
+          ],
+          [
+            105.5964951,
+            9.5634139
+          ],
+          [
+            105.5968943,
+            9.5638559
+          ]
+        ]
+      ]
     }
   },
   {
@@ -607,17 +989,6 @@
     }
   },
   {
-    "name": "Thới Trinh A",
-    "normalized_name": "thoi trinh a",
-    "aliases": [],
-    "type": "Khu vực",
-    "parent_adm": "B, C, Thới Bình, Thới Bình A, Thới Phong, Ô Môn, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
     "name": "Một phần Khu vực Phú Lợi",
     "normalized_name": "mot phan khu vuc phu loi",
     "aliases": [],
@@ -758,50 +1129,6 @@
     }
   },
   {
-    "name": "Khu vực Vĩnh Hòa",
-    "normalized_name": "khu vuc vinh hoa",
-    "aliases": [],
-    "type": "Khu vực",
-    "parent_adm": "Ngã Năm, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "Ấp Long Hòa",
-    "normalized_name": "ap long hoa",
-    "aliases": [],
-    "type": "Ấp",
-    "parent_adm": "Tân Long, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "Khu vực 4",
-    "normalized_name": "khu vuc 4",
-    "aliases": [],
-    "type": "Khu vực",
-    "parent_adm": "Ngã Năm, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "Long Thạnh 2",
-    "normalized_name": "long thanh 2",
-    "aliases": [],
-    "type": "Khu vực",
-    "parent_adm": "Thốt Nốt, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
     "name": "Tân Phú",
     "normalized_name": "tan phu",
     "aliases": [],
@@ -856,41 +1183,6 @@
     }
   },
   {
-    "name": "Khánh Bình",
-    "normalized_name": "khanh binh",
-    "aliases": [],
-    "type": "Khu vực",
-    "parent_adm": "Hưng Phú, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "Thạnh Hòa",
-    "normalized_name": "thanh hoa",
-    "aliases": [],
-    "type": "Khu vực",
-    "parent_adm": "Hưng Phú, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "KV Tân Phước",
-    "normalized_name": "kv tan phuoc",
-    "aliases": [
-      "Khu vực Tân Phước"
-    ],
-    "type": "Khu vực",
-    "parent_adm": "Thới Long, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
     "name": "Lê Văn Tư",
     "normalized_name": "le van tu",
     "aliases": [],
@@ -935,30 +1227,6 @@
     }
   },
   {
-    "name": "CS Nguyễn Thị Diễm",
-    "normalized_name": "cs nguyen thi diem",
-    "aliases": [
-      "Cơ sở Nguyễn Thị Diễm"
-    ],
-    "type": "Cơ sở/Khu chức năng",
-    "parent_adm": "Thốt Nốt, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "Trường Hòa",
-    "normalized_name": "truong hoa",
-    "aliases": [],
-    "type": "Khu vực",
-    "parent_adm": "Trường Thành, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
     "name": "ấp Phụng Quới B",
     "normalized_name": "ap phung quoi b",
     "aliases": [],
@@ -966,7 +1234,46 @@
     "parent_adm": "Thạnh An, Cần Thơ",
     "geom": {
       "type": "MultiPolygon",
-      "coordinates": []
+      "coordinates": [
+        [
+          [
+            105.2934456,
+            10.1429684
+          ],
+          [
+            105.2993243,
+            10.1480573
+          ],
+          [
+            105.3051305,
+            10.1513404
+          ],
+          [
+            105.3095768,
+            10.1541373
+          ],
+          [
+            105.3209709,
+            10.1458236
+          ],
+          [
+            105.3107387,
+            10.1345307
+          ],
+          [
+            105.303188,
+            10.1298171
+          ],
+          [
+            105.2934798,
+            10.136525
+          ],
+          [
+            105.2934456,
+            10.1429684
+          ]
+        ]
+      ]
     }
   },
   {
@@ -975,30 +1282,6 @@
     "aliases": [],
     "type": "Khu vực",
     "parent_adm": "Thới Phong A, Ô Môn, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "KV 1",
-    "normalized_name": "kv 1",
-    "aliases": [
-      "Khu vực 1"
-    ],
-    "type": "Khu vực",
-    "parent_adm": "KV 10, Cái Răng, Hưng Phú, Cần Thơ",
-    "geom": {
-      "type": "MultiPolygon",
-      "coordinates": []
-    }
-  },
-  {
-    "name": "Công ty CP Cảng Cần Thơ",
-    "normalized_name": "cong ty cp cang can tho",
-    "aliases": [],
-    "type": "Cơ sở/Khu chức năng",
-    "parent_adm": "Công ty CP Năng Lượng Tái Tạo CMC, Hưng Phú, Cần Thơ",
     "geom": {
       "type": "MultiPolygon",
       "coordinates": []
@@ -1564,7 +1847,74 @@
     "parent_adm": "Xã Thới Lai, Xã Đông Hiệp, Xã Đông Thuận, Cần Thơ",
     "geom": {
       "type": "MultiPolygon",
-      "coordinates": []
+      "coordinates": [
+        [
+          [
+            105.5628999,
+            10.0627723
+          ],
+          [
+            105.5481042,
+            10.0928176
+          ],
+          [
+            105.5613134,
+            10.1103934
+          ],
+          [
+            105.5878676,
+            10.128322
+          ],
+          [
+            105.5977452,
+            10.0900884
+          ],
+          [
+            105.6271687,
+            10.0709667
+          ],
+          [
+            105.6401149,
+            10.0081373
+          ],
+          [
+            105.6271687,
+            9.990379
+          ],
+          [
+            105.5911642,
+            9.9844685
+          ],
+          [
+            105.5703577,
+            9.9635211
+          ],
+          [
+            105.5564868,
+            9.9753611
+          ],
+          [
+            105.5564268,
+            10.0117799
+          ],
+          [
+            105.5813945,
+            10.0227075
+          ],
+          [
+            105.5702977,
+            10.0422852
+          ],
+          [
+            105.5684483,
+            10.0523013
+          ],
+          [
+            105.5628999,
+            10.0627723
+          ]
+        ]
+      ]
     }
   },
   {
@@ -1843,7 +2193,54 @@
     "parent_adm": "Vĩnh Thạnh, Cần Thơ",
     "geom": {
       "type": "MultiPolygon",
-      "coordinates": []
+      "coordinates": [
+        [
+          [
+            105.4675872,
+            10.1923498
+          ],
+          [
+            105.4677196,
+            10.1926611
+          ],
+          [
+            105.4678814,
+            10.1928831
+          ],
+          [
+            105.4682492,
+            10.1928735
+          ],
+          [
+            105.4685557,
+            10.1927335
+          ],
+          [
+            105.4686145,
+            10.1925767
+          ],
+          [
+            105.4685557,
+            10.1923691
+          ],
+          [
+            105.4684478,
+            10.1921568
+          ],
+          [
+            105.4682762,
+            10.1920409
+          ],
+          [
+            105.4678299,
+            10.1921495
+          ],
+          [
+            105.4675872,
+            10.1923498
+          ]
+        ]
+      ]
     }
   },
   {
@@ -1889,7 +2286,66 @@
     "parent_adm": "Thới Trinh B, Thới Trinh C, Thới Bình, Thới Bình A, Thới Phong, Ô Môn, Cần Thơ",
     "geom": {
       "type": "MultiPolygon",
-      "coordinates": []
+      "coordinates": [
+        [
+          [
+            105.6530838,
+            10.1462397
+          ],
+          [
+            105.6531868,
+            10.1463362
+          ],
+          [
+            105.6535357,
+            10.1465432
+          ],
+          [
+            105.6539924,
+            10.1468168
+          ],
+          [
+            105.6545344,
+            10.1466789
+          ],
+          [
+            105.6550948,
+            10.1462473
+          ],
+          [
+            105.655378,
+            10.1457497
+          ],
+          [
+            105.6549912,
+            10.1451561
+          ],
+          [
+            105.6541748,
+            10.1444224
+          ],
+          [
+            105.6534074,
+            10.1446172
+          ],
+          [
+            105.652573,
+            10.1453876
+          ],
+          [
+            105.6529019,
+            10.1461011
+          ],
+          [
+            105.653042,
+            10.146191
+          ],
+          [
+            105.6530838,
+            10.1462397
+          ]
+        ]
+      ]
     }
   },
   {
@@ -2124,15 +2580,54 @@
       "aliases": [],
       "type": "Hồ",
       "parent_adm": "Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "Cty TNHH KD TMDV Vinfast",
       "normalized_name": "cty tnhh kd tmdv vinfast",
-      "aliases": ["Công ty TNHH KD TMDV Vinfast"],
+      "aliases": [
+        "Công ty TNHH KD TMDV Vinfast"
+      ],
       "type": "Cơ sở/Khu chức năng",
       "parent_adm": "Thốt Nốt, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              105.5397539,
+              10.2643245
+            ],
+            [
+              105.539859,
+              10.2643838
+            ],
+            [
+              105.5400476,
+              10.2643226
+            ],
+            [
+              105.5401624,
+              10.264181
+            ],
+            [
+              105.5399523,
+              10.2640853
+            ],
+            [
+              105.5397734,
+              10.2641618
+            ],
+            [
+              105.5397539,
+              10.2643245
+            ]
+          ]
+        ]
+      }
     },
     {
       "name": "Ấp Thới Quan A",
@@ -2140,7 +2635,10 @@
       "aliases": [],
       "type": "Ấp",
       "parent_adm": "Thới Lai, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "Khu vực Trường Trung, Ấp Trường Đông",
@@ -2148,15 +2646,23 @@
       "aliases": [],
       "type": "Khu vực",
       "parent_adm": "Phước Thới, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "KCN Trà Nóc 2",
       "normalized_name": "kcn tra noc 2",
-      "aliases": ["Khu công nghiệp Trà Nóc 2"],
+      "aliases": [
+        "Khu công nghiệp Trà Nóc 2"
+      ],
       "type": "Cơ sở/Khu chức năng",
       "parent_adm": "Phước Thới, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "Công ty CP Cara Group - Chung cư Công ty 8",
@@ -2164,7 +2670,10 @@
       "aliases": [],
       "type": "Cơ sở/Khu chức năng",
       "parent_adm": "Cái Răng, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "Ấp Trường Thọ A, Trường Thọ 1",
@@ -2172,15 +2681,24 @@
       "aliases": [],
       "type": "Ấp",
       "parent_adm": "Trường Long, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "Khu dân cư 586 (Vạn Phát)",
       "normalized_name": "khu dan cu 586 van phat",
-      "aliases": ["KDC 586", "KDC Vạn Phát"],
+      "aliases": [
+        "KDC 586",
+        "KDC Vạn Phát"
+      ],
       "type": "Khu dân cư",
       "parent_adm": "Hưng Phú, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "ấp Phụng Thạnh, ấp E1",
@@ -2188,7 +2706,10 @@
       "aliases": [],
       "type": "Ấp",
       "parent_adm": "Thạnh Quới, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     },
     {
       "name": "ấp B1",
@@ -2196,6 +2717,9 @@
       "aliases": [],
       "type": "Ấp",
       "parent_adm": "Thạnh An, Cần Thơ",
-      "geom": { "type": "MultiPolygon", "coordinates": [] }
+      "geom": {
+        "type": "MultiPolygon",
+        "coordinates": []
+      }
     }
 ]
