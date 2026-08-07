@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:weather/weather.dart';
 import '../../apiWeather.dart';
 import 'map_screen.dart';
 
