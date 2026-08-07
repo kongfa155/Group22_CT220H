@@ -45,7 +45,7 @@ async function run() {
                 `
                 INSERT INTO place_geometries(name, normalized_name, aliases, type, parent_id, geom)
                 VALUES ($1, $2, $3, $4, $5, ST_SetSRID(ST_Multi(ST_GeomFromGeoJSON($6)), 4326))
-                ON CONFLICT (normalized_name) DO NOTHING
+                ON CONFLICT (normalized_name, parent_id) DO NOTHING
                 `,
                 [
                     entry.name,

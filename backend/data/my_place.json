@@ -2116,7 +2116,8 @@
     "geom": {
       "type": "MultiPolygon",
       "coordinates": []
-    },
+    }
+  },
     {
       "name": "Hồ Hoàn Kiếm",
       "normalized_name": "ho hoan kiem",

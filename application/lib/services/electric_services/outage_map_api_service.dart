@@ -51,6 +51,7 @@ class OutageMapApiService {
       //Lưu dữ liệu bằng thư viện sharePreferences để xài offline
       final preferences = await SharedPreferences.getInstance();
       await preferences.setString(_cacheDataKey, lightweightCache);
+      //Lưu dữ liệu theo dạng key : value vào file của máy 
       await preferences.setString(
         _cacheUpdatedAtKey,
         updatedAt.toIso8601String(),
@@ -69,6 +70,7 @@ class OutageMapApiService {
   }
 
   static Future<OutageMapResult?> _readCache() async {
+    //Đọc dữ liệu ra
     final preferences = await SharedPreferences.getInstance();
     final cachedData = preferences.getString(_cacheDataKey);
     if (cachedData == null) return null;
