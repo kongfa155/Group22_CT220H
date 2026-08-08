@@ -1,4 +1,4 @@
-package com.example.application;
+package com.nhom22.eaw;
 
 import io.flutter.embedding.android.FlutterActivity;
 

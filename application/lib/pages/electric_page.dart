@@ -17,26 +17,31 @@ class ElectricPage extends StatefulWidget {
 }
 
 class _ElectricPageState extends State<ElectricPage> {
+  // Tọa độ và phạm vi mặc định dùng để giới hạn bản đồ trong khu vực Cần Thơ.
   static const LatLng canThoCenter = LatLng(10.0452, 105.7469);
   static final LatLngBounds canThoBounds = LatLngBounds(
     const LatLng(9.0, 100.4),
     const LatLng(10.4, 105.95),
   );
 
-  // Ngưỡng zoom chuyển từ "tổng hợp theo phường" sang "chi tiết" - chỉnh
-  // lại số này sau khi test thực tế xem mức nào thấy rõ đường/khu vực.
+  // Ngưỡng zoom chuyển từ Phường sang Chi tiết
+  // chỉnh lại số này sau khi test thực tế xem mức nào thấy rõ đường/khu vực.
   static const double detailZoomThreshold = 14.0;
 
+  // Các controller và trạng thái tương tác trực tiếp với bản đồ.
   final MapController _mapController = MapController();
   final LocationService _locationService = LocationService();
   double _currentZoom = 12;
   bool _locating = false;
 
+  // Dữ liệu được tách theo mức zoom để tránh hiển thị quá nhiều chi tiết cùng lúc.
   List<BoundaryFeature> _boundaries = [];
   List<OutagePointGroup> _wardSummaries = [];
   List<OutageAreaFeature> _roadAreas = [];
   List<OutageAreaFeature> _placeAreas = [];
   List<OutagePointGroup> _fallbackPoints = [];
+
+  // Trạng thái tải dữ liệu và thông tin dùng để phản hồi cho người dùng.
   bool _loading = true;
   bool _usingCachedData = false;
   String _outageDate = '';
@@ -50,7 +55,8 @@ class _ElectricPageState extends State<ElectricPage> {
     super.initState();
     _loadData();
   }
-    //Lấy dữ liệu hằng ngày, lưu vào cache để sau này xài khi không có điện
+
+  // Lấy dữ liệu hằng ngày; service sẽ lưu cache để có thể dùng khi offline.
   Future<void> _loadData() async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
@@ -84,9 +90,10 @@ class _ElectricPageState extends State<ElectricPage> {
     }
   }
 
+  // Sinh màu ổn định theo tên phường: cùng một tên luôn nhận cùng một màu.
   Color _colorForName(String name) {
     final hash = name.codeUnits.fold<int>(0, (prev, c) => prev + c);
-    final random = Random(hash);
+    final random = Random(hash); //Hash để đảm bảo màu giống nhau mỗi khi mở app
     return Color.fromRGBO(
       100 + random.nextInt(155),
       100 + random.nextInt(155),
@@ -95,14 +102,17 @@ class _ElectricPageState extends State<ElectricPage> {
     );
   }
 
+  // Mở danh sách chi tiết của một nhóm lịch cúp điện trên bản đồ.
   void _showOutageDetailsGroup(OutagePointGroup group) {
     _showOutageListSheet(group.label, group.outages);
   }
 
+  // Mở chi tiết của một vùng đường hoặc địa điểm được người dùng chạm vào.
   void _showOutageDetailsSingle(String label, OutageDetailItem outage) {
     _showOutageListSheet(label, [outage]);
   }
 
+  // Bottom sheet có thể kéo để người dùng xem nhiều lịch mà không rời bản đồ.
   void _showOutageListSheet(String title, List<OutageDetailItem> outages) {
     showModalBottomSheet(
       context: context,
@@ -148,6 +158,7 @@ class _ElectricPageState extends State<ElectricPage> {
     );
   }
 
+  // Thuật toán ray casting kiểm tra điểm chạm có nằm trong một vùng đa giác hay không.
   bool _pointInPolygon(LatLng point, List<LatLng> polygon) {
     bool inside = false;
     for (int i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -162,6 +173,7 @@ class _ElectricPageState extends State<ElectricPage> {
     return inside;
   }
 
+  // Chỉ kiểm tra vùng cúp điện khi zoom gần để hạn chế phép tính không cần thiết.
   void _handleMapTap(LatLng point) {
     if (!_isDetailZoom) return;
 
@@ -174,7 +186,8 @@ class _ElectricPageState extends State<ElectricPage> {
       }
     }
   }
-    //Nút trở về tọa độ hiện tại của người dùng
+
+  // Xin quyền vị trí (nếu cần) rồi đưa bản đồ về tọa độ hiện tại của người dùng.
   Future<void> _moveToCurrentLocation() async {
     if (_locating) return;
 
@@ -333,6 +346,7 @@ class _ElectricPageState extends State<ElectricPage> {
                   ),
               ],
             ),
+          // Khi offline, dữ liệu cache vẫn được trình bày trong bảng lịch phía trên.
           if (_usingCachedData)
             Positioned.fill(
               child: ColoredBox(
@@ -349,6 +363,7 @@ class _ElectricPageState extends State<ElectricPage> {
                 ),
               ),
             ),
+          // Bảng tổng hợp lịch trong ngày luôn nổi phía trên bản đồ.
           if (!_loading && _error == null)
             Positioned(
               top: 8,
@@ -400,8 +415,7 @@ class _ElectricPageState extends State<ElectricPage> {
   }
 }
 
-
-//Bản lịch trình hằng ngày
+// Bảng tổng hợp lịch cúp điện hằng ngày theo từng phường.
 class _DailyOutagePanel extends StatelessWidget {
   final List<OutagePointGroup> groups;
   final String date;
@@ -415,9 +429,11 @@ class _DailyOutagePanel extends StatelessWidget {
     required this.fromCache,
   });
 
+  // Tổng số lịch của tất cả phường, dùng cho nhãn tóm tắt của bảng.
   int get outageCount =>
       groups.fold(0, (total, group) => total + group.outages.length);
 
+  // Chuẩn hóa ngày từ API sang định dạng quen thuộc với người dùng Việt Nam.
   String get displayDate {
     final parsedDate = DateTime.tryParse(date);
     return parsedDate == null
@@ -501,6 +517,7 @@ class _DailyOutagePanel extends StatelessWidget {
 }
 
 class _OutageDetailTile extends StatelessWidget {
+  // Một dòng chi tiết dùng chung cho bảng lịch và bottom sheet trên bản đồ.
   final OutageDetailItem outage;
 
   const _OutageDetailTile({required this.outage});

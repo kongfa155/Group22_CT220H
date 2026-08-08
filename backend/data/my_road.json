@@ -438,7 +438,8 @@
       "normalized_name": "nguyen thi tram",
       "aliases": [],
       "parent_name": "Cái Răng, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7439296,
           9.9790293
@@ -458,7 +459,8 @@
       "normalized_name": "tran nam phu",
       "aliases": [],
       "parent_name": "Tân An, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7573223,
           10.035697
@@ -482,7 +484,8 @@
       "normalized_name": "bui huu nghia",
       "aliases": [],
       "parent_name": "Long Tuyền, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7526077,
           10.0720703
@@ -678,7 +681,8 @@
       "normalized_name": "le thi hong gam",
       "aliases": [],
       "parent_name": "Thới An Đông, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.720538,
           10.095808
@@ -886,7 +890,8 @@
       "normalized_name": "pham ngoc hung",
       "aliases": [],
       "parent_name": "Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7561662,
           10.0495055
@@ -914,7 +919,8 @@
       "normalized_name": "hoang quoc viet",
       "aliases": [],
       "parent_name": "An Bình, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7417545,
           10.0206905
@@ -946,7 +952,8 @@
       "normalized_name": "truong vinh nguyen",
       "aliases": [],
       "parent_name": "Hưng Phú, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7573874,
           9.9950973
@@ -1078,7 +1085,8 @@
       "normalized_name": "yet kieu",
       "aliases": ["Yết Kêu"],
       "parent_name": "Cái Khế, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7728902,
           10.0409353
@@ -1130,7 +1138,8 @@
       "normalized_name": "nguyen binh khiem",
       "aliases": [],
       "parent_name": "Cái Khế, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7841084,
           10.0433638
@@ -1170,7 +1179,8 @@
       "normalized_name": "nguyen truyen thanh",
       "aliases": [],
       "parent_name": "Bình Thủy, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7485714,
           10.0660802
@@ -1218,7 +1228,8 @@
       "normalized_name": "duong so 1",
       "aliases": [],
       "parent_name": "Thới An Đông, Cần Thơ",
-      "geom": { "type": "LineString", "coordinates": [
+      "geom": { "type": "LineString",
+        "coordinates": [
         [
           105.7128072,
           10.1028597
@@ -1252,7 +1263,47 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [ [
+          105.7613666,
+          10.048107
+        ],
+          [
+            105.7642715,
+            10.0447271
+          ],
+          [
+            105.7647723,
+            10.0439801
+          ],
+          [
+            105.7652889,
+            10.0436138
+          ],
+          [
+            105.7683422,
+            10.0401874
+          ],
+          [
+            105.7698399,
+            10.0394442
+          ],
+          [
+            105.771419,
+            10.0377815
+          ],
+          [
+            105.7744925,
+            10.0328442
+          ],
+          [
+            105.7758887,
+            10.0302868
+          ],
+          [
+            105.7775327,
+            10.0255432
+          ]
+        ]
       }
     },
     {
@@ -1264,7 +1315,31 @@
       "parent_name": "Tân An, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [       [
+          105.7819021,
+          10.0312843
+        ],
+          [
+            105.7872208,
+            10.0360787
+          ],
+          [
+            105.7874147,
+            10.0360867
+          ],
+          [
+            105.7875317,
+            10.0362831
+          ],
+          [
+            105.7873777,
+            10.0364285
+          ],
+          [
+            105.7875728,
+            10.0375149
+          ]
+        ]
       }
     },
     {
@@ -1274,7 +1349,51 @@
       "parent_name": "Cái Khế, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7803002,
+          10.0454105
+        ],
+          [
+            105.7814089,
+            10.0464291
+          ],
+          [
+            105.7814457,
+            10.0465274
+          ],
+          [
+            105.7822893,
+            10.0471668
+          ],
+          [
+            105.7823732,
+            10.0471739
+          ],
+          [
+            105.783985,
+            10.048403
+          ],
+          [
+            105.7870066,
+            10.0503053
+          ],
+          [
+            105.7886726,
+            10.051363
+          ],
+          [
+            105.7897979,
+            10.0521055
+          ],
+          [
+            105.7898569,
+            10.0521938
+          ],
+          [
+            105.7901071,
+            10.0523644
+          ]
+        ]
       }
     },
     {
@@ -1286,7 +1405,59 @@
       "parent_name": "Bình Thủy, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7650783,
+          10.043572
+        ],
+          [
+            105.7501667,
+            10.0535301
+          ],
+          [
+            105.7499218,
+            10.0534632
+          ],
+          [
+            105.7496796,
+            10.0535651
+          ],
+          [
+            105.7495745,
+            10.0538267
+          ],
+          [
+            105.7493639,
+            10.0540648
+          ],
+          [
+            105.7433282,
+            10.0581108
+          ],
+          [
+            105.7366659,
+            10.0633194
+          ],
+          [
+            105.7329745,
+            10.0658312
+          ],
+          [
+            105.7264151,
+            10.0699204
+          ],
+          [
+            105.71683,
+            10.0758523
+          ],
+          [
+            105.7135448,
+            10.0779884
+          ],
+          [
+            105.713292,
+            10.0783361
+          ]
+        ]
       }
     },
     {
@@ -1298,7 +1469,43 @@
       "parent_name": "Bình Thủy, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7525913,
+          10.0721104
+        ],
+          [
+            105.7519174,
+            10.0723925
+          ],
+          [
+            105.7494219,
+            10.0752409
+          ],
+          [
+            105.7458585,
+            10.0778219
+          ],
+          [
+            105.7310164,
+            10.0881662
+          ],
+          [
+            105.7263357,
+            10.0915855
+          ],
+          [
+            105.7164331,
+            10.0992839
+          ],
+          [
+            105.715471,
+            10.0997219
+          ],
+          [
+            105.7022212,
+            10.1010221
+          ]
+        ]
       }
     },
     {
@@ -1310,7 +1517,75 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7706179,
+          10.0185841
+        ],
+          [
+            105.7648066,
+            10.0214503
+          ],
+          [
+            105.7586777,
+            10.0257307
+          ],
+          [
+            105.7542211,
+            10.0288125
+          ],
+          [
+            105.7381838,
+            10.0422802
+          ],
+          [
+            105.7312542,
+            10.0458681
+          ],
+          [
+            105.7232814,
+            10.0499533
+          ],
+          [
+            105.7179561,
+            10.052309
+          ],
+          [
+            105.7171145,
+            10.0530683
+          ],
+          [
+            105.7128764,
+            10.0587365
+          ],
+          [
+            105.7116823,
+            10.0592771
+          ],
+          [
+            105.6866591,
+            10.062562
+          ],
+          [
+            105.6848482,
+            10.0631847
+          ],
+          [
+            105.6705718,
+            10.0703324
+          ],
+          [
+            105.6698321,
+            10.0713859
+          ],
+          [
+            105.668618,
+            10.0801785
+          ],
+          [
+            105.6732304,
+            10.1046964
+          ]
+        ]
       }
     },
     {
@@ -1322,7 +1597,51 @@
       "parent_name": "Cái Răng, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.8287526,
+          9.9736912
+        ],
+          [
+            105.8269403,
+            9.9750638
+          ],
+          [
+            105.8252616,
+            9.9767949
+          ],
+          [
+            105.8252405,
+            9.9772405
+          ],
+          [
+            105.8247797,
+            9.977415
+          ],
+          [
+            105.8194275,
+            9.9831743
+          ],
+          [
+            105.8140792,
+            9.9888996
+          ],
+          [
+            105.8096136,
+            9.9936545
+          ],
+          [
+            105.7973993,
+            10.006769
+          ],
+          [
+            105.7795682,
+            10.0139545
+          ],
+          [
+            105.7751503,
+            10.0164296
+          ]
+        ]
       }
     },
     {
@@ -1332,7 +1651,23 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7764842,
+          10.0377669
+        ],
+          [
+            105.7800494,
+            10.0339055
+          ],
+          [
+            105.780587,
+            10.0337558
+          ],
+          [
+            105.7823394,
+            10.0319051
+          ]
+        ]
       }
     },
     {
@@ -1342,7 +1677,15 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7746065,
+          10.0327826
+        ],
+          [
+            105.7774253,
+            10.0404443
+          ]
+        ]
       }
     },
     {
@@ -1352,7 +1695,31 @@
       "parent_name": "Cái Răng, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7824691,
+          10.0128228
+        ],
+          [
+            105.7829302,
+            10.0142753
+          ],
+          [
+            105.7814332,
+            10.0195865
+          ],
+          [
+            105.7808333,
+            10.0232174
+          ],
+          [
+            105.7804981,
+            10.0264146
+          ],
+          [
+            105.7798556,
+            10.0293668
+          ]
+        ]
       }
     },
     {
@@ -1362,7 +1729,55 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [        [
+          105.7728669,
+          10.0201044
+        ],
+          [
+            105.7727234,
+            10.0175405
+          ],
+          [
+            105.7725921,
+            10.0165597
+          ],
+          [
+            105.7720803,
+            10.0152351
+          ],
+          [
+            105.7706068,
+            10.0129114
+          ],
+          [
+            105.7679334,
+            10.0099892
+          ],
+          [
+            105.7666806,
+            10.0087216
+          ],
+          [
+            105.7651988,
+            10.0079413
+          ],
+          [
+            105.7639467,
+            10.0076866
+          ],
+          [
+            105.7627833,
+            10.0076954
+          ],
+          [
+            105.7593065,
+            10.0089015
+          ],
+          [
+            105.7567922,
+            10.009954
+          ]
+        ]
       }
     },
     {
@@ -1374,7 +1789,31 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7744342,
+          10.0327102
+        ],
+          [
+            105.7710819,
+            10.0287684
+          ],
+          [
+            105.7678962,
+            10.0251564
+          ],
+          [
+            105.7580608,
+            10.0138033
+          ],
+          [
+            105.7531016,
+            10.0119878
+          ],
+          [
+            105.7500319,
+            10.0092358
+          ]
+        ]
       }
     },
     {
@@ -1384,7 +1823,15 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7876344,
+          10.0377198
+        ],
+          [
+            105.780347,
+            10.0450437
+          ]
+        ]
       }
     },
     {
@@ -1396,7 +1843,35 @@
       "parent_name": "Tân An, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7902052,
+          10.0365038
+        ],
+          [
+            105.7894708,
+            10.0357298
+          ],
+          [
+            105.7883598,
+            10.0336834
+          ],
+          [
+            105.7878495,
+            10.0309337
+          ],
+          [
+            105.7876797,
+            10.029399
+          ],
+          [
+            105.7863289,
+            10.0272104
+          ],
+          [
+            105.7861873,
+            10.0271249
+          ]
+        ]
       }
     },
     {
@@ -1406,7 +1881,15 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7740254,
+          10.024627
+        ],
+          [
+            105.7698952,
+            10.027157
+          ]
+        ]
       }
     },
     {
@@ -1439,17 +1922,35 @@
       "parent_name": "Bình Thủy, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "Phan Đăng Lưu",
-      "normalized_name": "phan dang luu",
-      "aliases": [],
-      "parent_name": "Thốt Nốt, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.759271,
+          10.0476884
+        ],
+          [
+            105.7625582,
+            10.0483112
+          ],
+          [
+            105.7670313,
+            10.0503176
+          ],
+          [
+            105.7697343,
+            10.0510425
+          ],
+          [
+            105.7699324,
+            10.0511969
+          ],
+          [
+            105.7700402,
+            10.0520713
+          ],
+          [
+            105.7716585,
+            10.0537215
+          ]
+        ]
       }
     },
     {
@@ -1459,7 +1960,27 @@
       "parent_name": "Cái Khế, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [         [
+          105.791249,
+          10.0422826
+        ],
+          [
+            105.7895545,
+            10.0452963
+          ],
+          [
+            105.7885942,
+            10.0469438
+          ],
+          [
+            105.7872026,
+            10.0499365
+          ],
+          [
+            105.7869885,
+            10.0503103
+          ]
+        ]
       }
     },
     {
@@ -1469,17 +1990,27 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "Lộ Bòng Bong",
-      "normalized_name": "lo bong bong",
-      "aliases": [],
-      "parent_name": "Phong Điền, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
+        "coordinates": [        [
+          105.7726085,
+          10.0507545
+        ],
+          [
+            105.7733012,
+            10.0501276
+          ],
+          [
+            105.7751926,
+            10.0482134
+          ],
+          [
+            105.7758751,
+            10.0475273
+          ],
+          [
+            105.776735,
+            10.0466951
+          ]
+        ]
       }
     },
     {
@@ -1489,7 +2020,15 @@
       "parent_name": "Ô Môn, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7692324,
+          10.0397504
+        ],
+          [
+            105.7696994,
+            10.0401465
+          ]
+        ]
       }
     },
     {
@@ -1499,7 +2038,19 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7761275,
+          10.0493762
+        ],
+          [
+            105.7776527,
+            10.0508571
+          ],
+          [
+            105.7780835,
+            10.0512753
+          ]
+        ]
       }
     },
     {
@@ -1509,7 +2060,23 @@
       "parent_name": "Tân An, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7872949,
+          10.0360402
+        ],
+          [
+            105.7868532,
+            10.0328241
+          ],
+          [
+            105.7867156,
+            10.0316548
+          ],
+          [
+            105.7860945,
+            10.0271886
+          ]
+        ]
       }
     },
     {
@@ -1519,7 +2086,67 @@
       "parent_name": "Ninh Kiều, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [[
+          105.77839,
+          9.9961978
+        ],
+          [
+            105.7743169,
+            10.0008036
+          ],
+          [
+            105.771525,
+            10.0039555
+          ],
+          [
+            105.7711557,
+            10.0040257
+          ],
+          [
+            105.7710309,
+            10.0042823
+          ],
+          [
+            105.771072,
+            10.0044864
+          ],
+          [
+            105.7708879,
+            10.0048155
+          ],
+          [
+            105.7625066,
+            10.0142335
+          ],
+          [
+            105.7622688,
+            10.0145435
+          ],
+          [
+            105.7596459,
+            10.0167724
+          ],
+          [
+            105.756841,
+            10.0190122
+          ],
+          [
+            105.7559586,
+            10.0196672
+          ],
+          [
+            105.7528613,
+            10.0226108
+          ],
+          [
+            105.7505715,
+            10.0243114
+          ],
+          [
+            105.7482109,
+            10.0267668
+          ]
+        ]
       }
     },
     {
@@ -1529,17 +2156,23 @@
       "parent_name": "Tân An, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "Kim Đồng",
-      "normalized_name": "kim dong",
-      "aliases": [],
-      "parent_name": "Ô Môn, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
+        "coordinates": [         [
+          105.7830441,
+          10.0361066
+        ],
+          [
+            105.783518,
+            10.0358696
+          ],
+          [
+            105.7856865,
+            10.0348948
+          ],
+          [
+            105.7883375,
+            10.0336947
+          ]
+        ]
       }
     },
     {
@@ -1688,57 +2321,19 @@
       "parent_name": "Phước Thới, Ô Môn, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "Nguyễn Chánh Tâm",
-      "normalized_name": "nguyen chanh tam",
-      "aliases": [],
-      "parent_name": "Trà Nóc, Bình Thủy, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "đường số 6",
-      "normalized_name": "duong so 6",
-      "aliases": [],
-      "parent_name": "KCN Trà Nóc 1, Trà Nóc, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "đường số 3",
-      "normalized_name": "duong so 3",
-      "aliases": [],
-      "parent_name": "KCN Trà Nóc 1, Trà Nóc, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "Nguyễn Bút Bảng",
-      "normalized_name": "nguyen but bang",
-      "aliases": [],
-      "parent_name": "Trà Nóc, Bình Thủy, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
-      }
-    },
-    {
-      "name": "Lê Thị Tạo",
-      "normalized_name": "le thi tao",
-      "aliases": [],
-      "parent_name": "Trà Nóc, Bình Thủy, Cần Thơ",
-      "geom": {
-        "type": "LineString",
-        "coordinates": []
+        "coordinates": [          [
+          105.7053191,
+          10.1009457
+        ],
+          [
+            105.7058576,
+            10.1058612
+          ],
+          [
+            105.7077021,
+            10.1077005
+          ]
+        ]
       }
     },
     {
@@ -1748,7 +2343,31 @@
       "parent_name": "Trà An, Bình Thủy, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [ [
+          105.7246824,
+          10.0711645
+        ],
+          [
+            105.7274715,
+            10.0761436
+          ],
+          [
+            105.7294126,
+            10.0793391
+          ],
+          [
+            105.7325258,
+            10.0836227
+          ],
+          [
+            105.7338938,
+            10.0845504
+          ],
+          [
+            105.7346811,
+            10.0855642
+          ]
+        ]
       }
     },
     {
@@ -1758,7 +2377,19 @@
       "parent_name": "An Thới, Bình Thủy, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [        [
+          105.7475742,
+          10.0603552
+        ],
+          [
+            105.7538041,
+            10.0644255
+          ],
+          [
+            105.7574611,
+            10.0679342
+          ]
+        ]
       }
     },
     {
@@ -1768,7 +2399,35 @@
       "parent_name": "An Thới, Bình Thủy, Cần Thơ",
       "geom": {
         "type": "LineString",
-        "coordinates": []
+        "coordinates": [  [
+          105.7561228,
+          10.049777
+        ],
+          [
+            105.7568069,
+            10.0533687
+          ],
+          [
+            105.7588844,
+            10.0540345
+          ],
+          [
+            105.7596886,
+            10.0541447
+          ],
+          [
+            105.7603281,
+            10.0543462
+          ],
+          [
+            105.761759,
+            10.0557762
+          ],
+          [
+            105.7624068,
+            10.0585139
+          ]
+        ]
       }
     }
 ]

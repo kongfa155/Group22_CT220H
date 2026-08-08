@@ -20,7 +20,7 @@ if (hasReleaseSigning) {
 }
 
 android {
-    namespace = "com.example.application"
+    namespace = "com.nhom22.eaw"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

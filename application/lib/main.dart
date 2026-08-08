@@ -44,13 +44,41 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> pages = const [ElectricPage(), WeatherPage()];
 
+  void _showAboutUs() {
+    showAboutDialog(
+      context: context,
+      applicationName: 'Electric and Weather',
+      applicationVersion: '1.0.0',
+      applicationIcon: const Icon(
+        Icons.electric_bolt,
+        size: 48,
+        color: Colors.amber,
+      ),
+      children: const [
+        SizedBox(height: 8),
+        Text(
+          'Ứng dụng xem lịch cúp điện và dự báo thời tiết tích hợp bản đồ trực tuyến.',
+        ),
+        SizedBox(height: 8),
+        Text('Phát triển bởi Nhóm 22 - CT220H.'),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        //Tiêu đề chung cho cả bên điện và thời tiết (Tui xóa cái tiêu đề thời tiết cũ của ông r nha TDuy,đem nó ra đây)
+      //Tiêu đề chung cho cả bên điện và thời tiết (Tui xóa cái tiêu đề thời tiết cũ của ông r nha TDuy,đem nó ra đây)
       appBar: AppBar(
         title: Text(currentPage == 0 ? 'Lịch cúp điện' : 'Dự báo thời tiết'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: 'About Us',
+            onPressed: _showAboutUs,
+            icon: const Icon(Icons.info_outline),
+          ),
+        ],
       ),
       body: pages[currentPage],
 
